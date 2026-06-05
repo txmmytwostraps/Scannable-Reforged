@@ -15,6 +15,8 @@ pluginManagement {
                 includeGroup("fabric-loom")
             }
         }
+        // Architectury Loom's own tooling (mcinjector, DiffPatch) resolves from here,
+        // even for a NeoForge-only build -- keep it.
         exclusiveContent {
             forRepository { maven("https://maven.minecraftforge.net") }
             filter {

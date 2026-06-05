@@ -38,3 +38,10 @@ forge*changelog.txt
 # minecraft
 run/
 logs/
+
+# build/run logs
+*.log
+
+# local-only dev docs (kept on disk, never pushed)
+/DEV_NOTES.md
+/scannable_neoforge_1.21.1_port_plan.md
