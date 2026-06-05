@@ -5,8 +5,8 @@ import li.cil.scannable.common.config.Constants;
 import li.cil.scannable.common.config.Strings;
 import li.cil.scannable.common.container.EntityModuleContainerMenu;
 import li.cil.scannable.common.scanning.ConfigurableEntityScannerModule;
-import net.fabricmc.api.EnvType;
-import net.fabricmc.api.Environment;
+import net.neoforged.api.distmarker.Dist;
+import net.neoforged.api.distmarker.OnlyIn;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceKey;
@@ -133,7 +133,7 @@ public final class ConfigurableEntityScannerModuleItem extends ScannerModuleItem
     // --------------------------------------------------------------------- //
     // Item
 
-    @Environment(EnvType.CLIENT)
+    @OnlyIn(Dist.CLIENT)
     @Override
     public void appendHoverText(final ItemStack stack, final Item.TooltipContext context, final List<Component> tooltip, final TooltipFlag flag) {
         super.appendHoverText(stack, context, tooltip, flag);

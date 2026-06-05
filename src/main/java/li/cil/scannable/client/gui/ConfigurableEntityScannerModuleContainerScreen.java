@@ -6,8 +6,8 @@ import li.cil.scannable.common.container.EntityModuleContainerMenu;
 import li.cil.scannable.common.item.ConfigurableEntityScannerModuleItem;
 import li.cil.scannable.common.network.Network;
 import li.cil.scannable.common.network.message.SetConfiguredModuleItemAtMessage;
-import net.fabricmc.api.EnvType;
-import net.fabricmc.api.Environment;
+import net.neoforged.api.distmarker.Dist;
+import net.neoforged.api.distmarker.OnlyIn;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.renderer.entity.EntityRenderDispatcher;
@@ -28,7 +28,7 @@ import java.util.Map;
 
 import static li.cil.scannable.util.UnitConversion.toRadians;
 
-@Environment(EnvType.CLIENT)
+@OnlyIn(Dist.CLIENT)
 public class ConfigurableEntityScannerModuleContainerScreen extends AbstractConfigurableScannerModuleContainerScreen<EntityModuleContainerMenu, EntityType<?>> {
     private static final Map<EntityType<?>, Entity> RENDER_ENTITIES = new HashMap<>();
 

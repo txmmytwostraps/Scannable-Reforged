@@ -2,8 +2,8 @@ package li.cil.scannable.api.scanning;
 
 import com.mojang.blaze3d.vertex.PoseStack;
 import li.cil.scannable.api.API;
-import net.fabricmc.api.EnvType;
-import net.fabricmc.api.Environment;
+import net.neoforged.api.distmarker.Dist;
+import net.neoforged.api.distmarker.OnlyIn;
 import net.minecraft.client.Camera;
 import net.minecraft.client.renderer.MultiBufferSource;
 import net.minecraft.core.Registry;
@@ -35,7 +35,7 @@ import java.util.function.Consumer;
  * results and return all valid results when <code>collectScanResults</code>
  * is called.
  */
-@Environment(EnvType.CLIENT)
+@OnlyIn(Dist.CLIENT)
 public interface ScanResultProvider {
     /**
      * The registry name of the registry holding scan result providers.

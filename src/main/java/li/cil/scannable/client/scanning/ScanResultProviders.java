@@ -1,27 +1,28 @@
 package li.cil.scannable.client.scanning;
 
-import dev.architectury.registry.registries.DeferredRegister;
-import dev.architectury.registry.registries.RegistrySupplier;
 import li.cil.scannable.api.API;
 import li.cil.scannable.api.scanning.ScanResultProvider;
 import li.cil.scannable.util.RegistryUtils;
-import net.fabricmc.api.EnvType;
-import net.fabricmc.api.Environment;
+import net.neoforged.api.distmarker.Dist;
+import net.neoforged.api.distmarker.OnlyIn;
+import net.neoforged.neoforge.registries.DeferredHolder;
+import net.neoforged.neoforge.registries.DeferredRegister;
 
-@Environment(EnvType.CLIENT)
+@OnlyIn(Dist.CLIENT)
 public final class ScanResultProviders {
     private static final DeferredRegister<ScanResultProvider> DEFERRED_REGISTER = RegistryUtils.get(ScanResultProvider.REGISTRY);
 
     // --------------------------------------------------------------------- //
 
-    public static final RegistrySupplier<ScanResultProviderBlock> BLOCKS = DEFERRED_REGISTER.register(
+    public static final DeferredHolder<ScanResultProvider, ScanResultProviderBlock> BLOCKS = DEFERRED_REGISTER.register(
         API.SCAN_RESULT_PROVIDER_BLOCKS.getPath(), ScanResultProviderBlock::new);
-    public static final RegistrySupplier<ScanResultProviderEntity> ENTITIES = DEFERRED_REGISTER.register(
+    public static final DeferredHolder<ScanResultProvider, ScanResultProviderEntity> ENTITIES = DEFERRED_REGISTER.register(
         API.SCAN_RESULT_PROVIDER_ENTITIES.getPath(), ScanResultProviderEntity::new);
 
     // --------------------------------------------------------------------- //
 
     public static void initialize() {
-        RegistryUtils.builder(ScanResultProvider.REGISTRY).build();
+        DEFERRED_REGISTER.makeRegistry(builder -> {
+        });
     }
 }

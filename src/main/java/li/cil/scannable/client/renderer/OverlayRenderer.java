@@ -9,8 +9,8 @@ import com.mojang.blaze3d.vertex.VertexFormat;
 import li.cil.scannable.api.API;
 import li.cil.scannable.common.config.Strings;
 import li.cil.scannable.common.item.ScannerItem;
-import net.fabricmc.api.EnvType;
-import net.fabricmc.api.Environment;
+import net.neoforged.api.distmarker.Dist;
+import net.neoforged.api.distmarker.OnlyIn;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.renderer.GameRenderer;
@@ -20,7 +20,7 @@ import net.minecraft.util.Mth;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
 
-@Environment(EnvType.CLIENT)
+@OnlyIn(Dist.CLIENT)
 public final class OverlayRenderer {
     private static final ResourceLocation PROGRESS = ResourceLocation.fromNamespaceAndPath(API.MOD_ID, "textures/gui/overlay/scanner_progress.png");
 

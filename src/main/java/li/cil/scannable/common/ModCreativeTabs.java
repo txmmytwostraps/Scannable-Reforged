@@ -1,27 +1,27 @@
 package li.cil.scannable.common;
 
-import dev.architectury.registry.CreativeTabRegistry;
-import dev.architectury.registry.registries.DeferredRegister;
-import dev.architectury.registry.registries.RegistrySupplier;
 import li.cil.scannable.api.API;
 import li.cil.scannable.common.config.CommonConfig;
 import li.cil.scannable.common.config.Strings;
 import li.cil.scannable.common.energy.ItemEnergyStorage;
 import li.cil.scannable.common.item.Items;
 import li.cil.scannable.common.item.ModItem;
+import li.cil.scannable.common.neoforge.ModEventBus;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.world.item.CreativeModeTab;
 import net.minecraft.world.item.ItemStack;
+import net.neoforged.neoforge.registries.DeferredHolder;
+import net.neoforged.neoforge.registries.DeferredRegister;
 
 public final class ModCreativeTabs {
-    public static final DeferredRegister<CreativeModeTab> TABS = DeferredRegister.create(API.MOD_ID, Registries.CREATIVE_MODE_TAB);
+    public static final DeferredRegister<CreativeModeTab> TABS = DeferredRegister.create(Registries.CREATIVE_MODE_TAB, API.MOD_ID);
 
-    public static final RegistrySupplier<CreativeModeTab> COMMON = TABS.register("common", () ->
-            CreativeTabRegistry.create(builder -> {
-                builder.icon(() -> new ItemStack(Items.SCANNER.get()));
-                builder.title(Strings.CREATIVE_TAB_TITLE);
-                builder.displayItems((parameters, output) -> {
+    public static final DeferredHolder<CreativeModeTab, CreativeModeTab> COMMON = TABS.register("common", () ->
+            CreativeModeTab.builder()
+                .icon(() -> new ItemStack(Items.SCANNER.get()))
+                .title(Strings.CREATIVE_TAB_TITLE)
+                .displayItems((parameters, output) -> {
                     if (CommonConfig.useEnergy) {
                         final var stack = new ItemStack(Items.SCANNER.get());
                         ItemEnergyStorage.of(stack).ifPresent(energy -> {
@@ -33,10 +33,10 @@ public final class ModCreativeTabs {
                     BuiltInRegistries.ITEM.stream()
                             .filter(item -> item instanceof ModItem)
                             .forEach(item -> output.accept(new ItemStack(item)));
-                });
-            }));
+                })
+                .build());
 
     public static void initialize() {
-        TABS.register();
+        TABS.register(ModEventBus.INSTANCE);
     }
 }

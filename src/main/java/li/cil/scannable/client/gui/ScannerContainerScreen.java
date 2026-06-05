@@ -2,8 +2,8 @@ package li.cil.scannable.client.gui;
 
 import li.cil.scannable.api.API;
 import li.cil.scannable.common.container.ScannerContainerMenu;
-import net.fabricmc.api.EnvType;
-import net.fabricmc.api.Environment;
+import net.neoforged.api.distmarker.Dist;
+import net.neoforged.api.distmarker.OnlyIn;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.screens.inventory.AbstractContainerScreen;
 import net.minecraft.network.chat.Component;
@@ -15,7 +15,7 @@ import net.minecraft.world.item.ItemStack;
 
 import javax.annotation.Nullable;
 
-@Environment(EnvType.CLIENT)
+@OnlyIn(Dist.CLIENT)
 public class ScannerContainerScreen extends AbstractContainerScreen<ScannerContainerMenu> {
     private static final ResourceLocation BACKGROUND = ResourceLocation.fromNamespaceAndPath(API.MOD_ID, "textures/gui/container/scanner.png");
     private static final Component SCANNER_MODULES_TEXT = Component.translatable("gui.scannable.scanner.active_modules");

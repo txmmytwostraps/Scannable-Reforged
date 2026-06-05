@@ -4,8 +4,8 @@ import dev.architectury.networking.NetworkManager;
 import li.cil.scannable.common.network.message.AbstractMessage;
 import li.cil.scannable.common.network.message.RemoveConfiguredModuleItemAtMessage;
 import li.cil.scannable.common.network.message.SetConfiguredModuleItemAtMessage;
-import net.fabricmc.api.EnvType;
-import net.fabricmc.api.Environment;
+import net.neoforged.api.distmarker.Dist;
+import net.neoforged.api.distmarker.OnlyIn;
 
 public final class Network {
     public static void initialize() {
@@ -17,7 +17,7 @@ public final class Network {
             (message, context) -> context.queue(() -> message.handleMessage(context)));
     }
 
-    @Environment(EnvType.CLIENT)
+    @OnlyIn(Dist.CLIENT)
     public static void sendToServer(final AbstractMessage message) {
         NetworkManager.sendToServer(message);
     }

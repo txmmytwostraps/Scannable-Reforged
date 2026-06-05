@@ -1,10 +1,9 @@
 package li.cil.scannable.util;
 
-import dev.architectury.registry.registries.DeferredRegister;
-import dev.architectury.registry.registries.RegistrarBuilder;
-import dev.architectury.registry.registries.RegistrarManager;
+import li.cil.scannable.common.neoforge.ModEventBus;
 import net.minecraft.core.Registry;
 import net.minecraft.resources.ResourceKey;
+import net.neoforged.neoforge.registries.DeferredRegister;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -20,15 +19,10 @@ public final class RegistryUtils {
     private static Phase phase = Phase.PRE_INIT;
     private static String modId;
 
-    @SafeVarargs
-    public static <T> RegistrarBuilder<T> builder(ResourceKey<Registry<T>> registryKey, T... typeGetter) {
-        return RegistrarManager.get(modId).builder(registryKey.location(), typeGetter);
-    }
-
-    public static <T> DeferredRegister<T> get(final ResourceKey<Registry<T>> registryKey) {
+    public static <T> DeferredRegister<T> get(final ResourceKey<? extends Registry<T>> registryKey) {
         if (phase != Phase.INIT) throw new IllegalStateException();
 
-        final DeferredRegister<T> entry = DeferredRegister.create(modId, registryKey);
+        final DeferredRegister<T> entry = DeferredRegister.create(registryKey, modId);
         ENTRIES.add(entry);
         return entry;
     }
@@ -44,7 +38,7 @@ public final class RegistryUtils {
         phase = Phase.POST_INIT;
 
         for (final DeferredRegister<?> register : ENTRIES) {
-            register.register();
+            register.register(ModEventBus.INSTANCE);
         }
 
         ENTRIES.clear();

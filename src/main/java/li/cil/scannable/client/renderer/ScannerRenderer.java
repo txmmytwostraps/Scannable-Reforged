@@ -9,8 +9,8 @@ import com.mojang.blaze3d.vertex.*;
 import dev.architectury.injectables.annotations.ExpectPlatform;
 import li.cil.scannable.client.ScanManager;
 import li.cil.scannable.client.shader.Shaders;
-import net.fabricmc.api.EnvType;
-import net.fabricmc.api.Environment;
+import net.neoforged.api.distmarker.Dist;
+import net.neoforged.api.distmarker.OnlyIn;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.ShaderInstance;
 import net.minecraft.world.phys.Vec3;
@@ -21,7 +21,7 @@ import static org.lwjgl.opengl.GL11.glDrawBuffer;
 import static org.lwjgl.opengl.GL30.GL_FRAMEBUFFER;
 import static org.lwjgl.opengl.GL30.glBindFramebuffer;
 
-@Environment(EnvType.CLIENT)
+@OnlyIn(Dist.CLIENT)
 public enum ScannerRenderer {
     INSTANCE;
 

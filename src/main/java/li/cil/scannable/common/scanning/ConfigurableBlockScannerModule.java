@@ -6,8 +6,8 @@ import li.cil.scannable.client.scanning.ScanResultProviders;
 import li.cil.scannable.client.scanning.filter.BlockCacheScanFilter;
 import li.cil.scannable.common.config.CommonConfig;
 import li.cil.scannable.common.item.ConfigurableBlockScannerModuleItem;
-import net.fabricmc.api.EnvType;
-import net.fabricmc.api.Environment;
+import net.neoforged.api.distmarker.Dist;
+import net.neoforged.api.distmarker.OnlyIn;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.state.BlockState;
@@ -23,19 +23,19 @@ public enum ConfigurableBlockScannerModule implements BlockScannerModule {
         return CommonConfig.energyCostModuleBlock;
     }
 
-    @Environment(EnvType.CLIENT)
+    @OnlyIn(Dist.CLIENT)
     @Override
     public ScanResultProvider getResultProvider() {
         return ScanResultProviders.BLOCKS.get();
     }
 
-    @Environment(EnvType.CLIENT)
+    @OnlyIn(Dist.CLIENT)
     @Override
     public float adjustLocalRange(final float range) {
         return range * CommonConfig.rangeModifierModuleBlock;
     }
 
-    @Environment(EnvType.CLIENT)
+    @OnlyIn(Dist.CLIENT)
     @Override
     public Predicate<BlockState> getFilter(final ItemStack module) {
         final List<Block> blocks = ConfigurableBlockScannerModuleItem.getBlocks(module);

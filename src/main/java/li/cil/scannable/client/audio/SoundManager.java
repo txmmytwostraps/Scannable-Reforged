@@ -1,8 +1,8 @@
 package li.cil.scannable.client.audio;
 
 import li.cil.scannable.api.API;
-import net.fabricmc.api.EnvType;
-import net.fabricmc.api.Environment;
+import net.neoforged.api.distmarker.Dist;
+import net.neoforged.api.distmarker.OnlyIn;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.resources.sounds.SimpleSoundInstance;
 import net.minecraft.resources.ResourceLocation;
@@ -10,7 +10,7 @@ import net.minecraft.sounds.SoundEvent;
 
 import javax.annotation.Nullable;
 
-@Environment(EnvType.CLIENT)
+@OnlyIn(Dist.CLIENT)
 public final class SoundManager {
     private static final SoundEvent SCANNER_CHARGE = SoundEvent.createVariableRangeEvent(ResourceLocation.fromNamespaceAndPath(API.MOD_ID, "scanner_charge"));
     private static final SoundEvent SCANNER_ACTIVATE = SoundEvent.createVariableRangeEvent(ResourceLocation.fromNamespaceAndPath(API.MOD_ID, "scanner_activate"));

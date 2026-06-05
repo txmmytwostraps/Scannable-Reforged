@@ -1,7 +1,7 @@
 package li.cil.scannable.api.scanning;
 
-import net.fabricmc.api.EnvType;
-import net.fabricmc.api.Environment;
+import net.neoforged.api.distmarker.Dist;
+import net.neoforged.api.distmarker.OnlyIn;
 import net.minecraft.world.item.ItemStack;
 
 import javax.annotation.Nullable;
@@ -66,7 +66,7 @@ public interface ScannerModule {
      * @return the id of the scan provider this module uses.
      */
     @Nullable
-    @Environment(EnvType.CLIENT)
+    @OnlyIn(Dist.CLIENT)
     ScanResultProvider getResultProvider();
 
     /**
@@ -80,7 +80,7 @@ public interface ScannerModule {
      * @param range the input range.
      * @return the adjusted range.
      */
-    @Environment(EnvType.CLIENT)
+    @OnlyIn(Dist.CLIENT)
     default float adjustGlobalRange(final float range) {
         return range;
     }

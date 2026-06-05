@@ -17,8 +17,8 @@ import li.cil.scannable.client.ClientConfig;
 import li.cil.scannable.client.shader.Shaders;
 import li.cil.scannable.common.item.ScannerModuleItem;
 import li.cil.scannable.common.scanning.filter.IgnoredBlocks;
-import net.fabricmc.api.EnvType;
-import net.fabricmc.api.Environment;
+import net.neoforged.api.distmarker.Dist;
+import net.neoforged.api.distmarker.OnlyIn;
 import net.minecraft.client.Camera;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.MultiBufferSource;
@@ -54,7 +54,7 @@ import java.util.*;
 import java.util.function.Consumer;
 import java.util.function.Predicate;
 
-@Environment(EnvType.CLIENT)
+@OnlyIn(Dist.CLIENT)
 public final class ScanResultProviderBlock extends AbstractScanResultProvider {
     private static final Logger LOGGER = LogManager.getLogger();
 
