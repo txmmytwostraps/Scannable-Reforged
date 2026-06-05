@@ -85,7 +85,7 @@ public final class CommonConfig {
 
     @Path("range") @WorldRestart @Min(0) @Max(1)
     @Comment("Relative effective range of the spawner module.")
-    public static float rangeModifierModuleSpawner = 0.25f;
+    public static float rangeModifierModuleSpawner = 1.0f;
 
     // TODO Migrate to range category in next major version.
     @Path("general") @WorldRestart @Min(16) @Max(128)
