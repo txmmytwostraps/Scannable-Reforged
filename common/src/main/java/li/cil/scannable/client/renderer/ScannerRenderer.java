@@ -114,14 +114,12 @@ public enum ScannerRenderer {
         RenderSystem.backupProjectionMatrix();
         RenderSystem.setProjectionMatrix(new Matrix4f().setOrtho(0, width, 0, height, 1, 100), VertexSorting.ORTHOGRAPHIC_Z);
 
-        final Tesselator tesselator = Tesselator.getInstance();
-        final BufferBuilder buffer = tesselator.getBuilder();
-        buffer.begin(VertexFormat.Mode.QUADS, DefaultVertexFormat.POSITION_TEX);
-        buffer.vertex(0, 0, -50).uv(0, 0).endVertex();
-        buffer.vertex(width, 0, -50).uv(1, 0).endVertex();
-        buffer.vertex(width, height, -50).uv(1, 1).endVertex();
-        buffer.vertex(0, height, -50).uv(0, 1).endVertex();
-        tesselator.end();
+        final BufferBuilder buffer = Tesselator.getInstance().begin(VertexFormat.Mode.QUADS, DefaultVertexFormat.POSITION_TEX);
+        buffer.addVertex(0, 0, -50).setUv(0, 0);
+        buffer.addVertex(width, 0, -50).setUv(1, 0);
+        buffer.addVertex(width, height, -50).setUv(1, 1);
+        buffer.addVertex(0, height, -50).setUv(0, 1);
+        BufferUploader.drawWithShader(buffer.buildOrThrow());
 
         RenderSystem.restoreProjectionMatrix();
 

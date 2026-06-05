@@ -121,10 +121,10 @@ public abstract class AbstractScanResultProvider implements ScanResultProvider {
 
     protected static void drawQuad(final VertexConsumer buffer, final PoseStack poseStack, final float width, final float height, final float r, final float g, final float b, final float a) {
         final var matrix = poseStack.last().pose();
-        buffer.vertex(matrix, -width * 0.5f, height * 0.5f, 0).color(r, g, b, a).uv(0, 1f).endVertex();
-        buffer.vertex(matrix, width * 0.5f, height * 0.5f, 0).color(r, g, b, a).uv(1f, 1f).endVertex();
-        buffer.vertex(matrix, width * 0.5f, -height * 0.5f, 0).color(r, g, b, a).uv(1f, 0).endVertex();
-        buffer.vertex(matrix, -width * 0.5f, -height * 0.5f, 0).color(r, g, b, a).uv(0, 0).endVertex();
+        buffer.addVertex(matrix, -width * 0.5f, height * 0.5f, 0).setColor(r, g, b, a).setUv(0, 1f);
+        buffer.addVertex(matrix, width * 0.5f, height * 0.5f, 0).setColor(r, g, b, a).setUv(1f, 1f);
+        buffer.addVertex(matrix, width * 0.5f, -height * 0.5f, 0).setColor(r, g, b, a).setUv(1f, 0);
+        buffer.addVertex(matrix, -width * 0.5f, -height * 0.5f, 0).setColor(r, g, b, a).setUv(0, 0);
     }
 
     // --------------------------------------------------------------------- //

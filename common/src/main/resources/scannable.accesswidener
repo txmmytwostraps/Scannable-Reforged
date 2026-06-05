@@ -10,7 +10,7 @@ accessible  field  net/minecraft/client/renderer/RenderStateShard COLOR_WRITE Ln
 accessible  class  net/minecraft/client/renderer/RenderStateShard$TextureStateShard
 accessible method  net/minecraft/world/level/chunk/PalettedContainer get (I)Ljava/lang/Object;
 accessible  field  net/minecraft/client/renderer/GameRenderer renderHand Z
-accessible method  net/minecraft/client/renderer/GameRenderer renderItemInHand (Lcom/mojang/blaze3d/vertex/PoseStack;Lnet/minecraft/client/Camera;F)V
+accessible method  net/minecraft/client/renderer/GameRenderer renderItemInHand (Lnet/minecraft/client/Camera;FLorg/joml/Matrix4f;)V
 accessible method  net/minecraft/world/level/Level getEntities ()Lnet/minecraft/world/level/entity/LevelEntityGetter;
 accessible method  net/minecraft/util/thread/BlockableEventLoop submitAsync (Ljava/lang/Runnable;)Ljava/util/concurrent/CompletableFuture;
 accessible method  net/minecraft/world/entity/Entity setLevel (Lnet/minecraft/world/level/Level;)V

@@ -8,15 +8,15 @@ import net.minecraft.resources.ResourceLocation;
 import net.neoforged.api.distmarker.Dist;
 import net.neoforged.api.distmarker.OnlyIn;
 import net.neoforged.bus.api.SubscribeEvent;
-import net.neoforged.fml.common.Mod;
+import net.neoforged.fml.common.EventBusSubscriber;
 import net.neoforged.fml.event.lifecycle.FMLClientSetupEvent;
-import net.neoforged.neoforge.client.event.RegisterGuiOverlaysEvent;
+import net.neoforged.neoforge.client.event.ClientTickEvent;
+import net.neoforged.neoforge.client.event.RegisterGuiLayersEvent;
 import net.neoforged.neoforge.client.event.RenderLevelStageEvent;
 import net.neoforged.neoforge.common.NeoForge;
-import net.neoforged.neoforge.event.TickEvent;
 
 @OnlyIn(Dist.CLIENT)
-@Mod.EventBusSubscriber(modid = API.MOD_ID, bus = Mod.EventBusSubscriber.Bus.MOD, value = Dist.CLIENT)
+@EventBusSubscriber(modid = API.MOD_ID, bus = EventBusSubscriber.Bus.MOD, value = Dist.CLIENT)
 public final class ClientSetupNeoForge {
     @SubscribeEvent
     public static void handleSetupEvent(final FMLClientSetupEvent event) {
@@ -27,23 +27,22 @@ public final class ClientSetupNeoForge {
     }
 
     @SubscribeEvent
-    public static void handleRegisterOverlaysEvent(final RegisterGuiOverlaysEvent event) {
-        event.registerAboveAll(ResourceLocation.fromNamespaceAndPath(API.MOD_ID, "scanner_results"), (gui, poseStack, partialTick, width, height) -> {
+    public static void handleRegisterLayersEvent(final RegisterGuiLayersEvent event) {
+        event.registerAboveAll(ResourceLocation.fromNamespaceAndPath(API.MOD_ID, "scanner_results"), (guiGraphics, deltaTracker) -> {
+            final float partialTick = deltaTracker.getGameTimeDeltaPartialTick(false);
             ScanManager.renderGui(partialTick);
-            OverlayRenderer.render(poseStack, partialTick);
+            OverlayRenderer.render(guiGraphics, partialTick);
         });
     }
 
-    public static void handleClientTickEvent(final TickEvent.ClientTickEvent event) {
-        if (event.phase == TickEvent.Phase.END) {
-            ScanManager.tick();
-        }
+    public static void handleClientTickEvent(final ClientTickEvent.Post event) {
+        ScanManager.tick();
     }
 
     public static void handleRenderLevelEvent(final RenderLevelStageEvent event) {
         if (event.getStage() == RenderLevelStageEvent.Stage.AFTER_LEVEL) {
             ScanManager.setMatrices(event.getPoseStack(), event.getProjectionMatrix());
-            ScanManager.renderLevel(event.getPartialTick());
+            ScanManager.renderLevel(event.getPartialTick().getGameTimeDeltaPartialTick(false));
         }
     }
 }

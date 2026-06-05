@@ -1,8 +1,8 @@
 package li.cil.scannable.client;
 
 import com.mojang.blaze3d.systems.RenderSystem;
+import com.mojang.blaze3d.vertex.ByteBufferBuilder;
 import com.mojang.blaze3d.vertex.PoseStack;
-import com.mojang.blaze3d.vertex.Tesselator;
 import com.mojang.blaze3d.vertex.VertexSorting;
 import li.cil.scannable.api.scanning.ScanResult;
 import li.cil.scannable.api.scanning.ScanResultProvider;
@@ -41,6 +41,9 @@ public final class ScanManager {
     private static final int SCAN_GROWTH_DURATION = 2000;
     // Reference render distance the above constants are relative to.
     private static final int REFERENCE_RENDER_DISTANCE = 12;
+
+    // Reusable buffer for batched immediate-mode result rendering.
+    private static final ByteBufferBuilder RENDER_BUFFER = new ByteBufferBuilder(256);
 
     // --------------------------------------------------------------------- //
 
@@ -258,13 +261,13 @@ public final class ScanManager {
             // Using shaders, so we render as game overlay; restore matrices as used for level rendering.
             RenderSystem.backupProjectionMatrix();
             RenderSystem.setProjectionMatrix(worldProjectionMatrix, VertexSorting.ORTHOGRAPHIC_Z);
-            RenderSystem.getModelViewStack().pushPose();
-            RenderSystem.getModelViewStack().last().pose().identity();
+            RenderSystem.getModelViewStack().pushMatrix();
+            RenderSystem.getModelViewStack().identity();
             RenderSystem.applyModelViewMatrix();
 
             render(ScanResultRenderContext.GUI, partialTick, worldViewModelStack, worldProjectionMatrix);
 
-            RenderSystem.getModelViewStack().popPose();
+            RenderSystem.getModelViewStack().popMatrix();
             RenderSystem.applyModelViewMatrix();
             RenderSystem.restoreProjectionMatrix();
         }
@@ -287,7 +290,7 @@ public final class ScanManager {
         // This allows providers to do more optimized rendering, in e.g.
         // setting up the render state once before rendering all visuals,
         // or even set up display lists or VBOs.
-        final MultiBufferSource.BufferSource renderTypeBuffer = MultiBufferSource.immediate(Tesselator.getInstance().getBuilder());
+        final MultiBufferSource.BufferSource renderTypeBuffer = MultiBufferSource.immediate(RENDER_BUFFER);
         try {
             for (final Map.Entry<ScanResultProvider, List<ScanResult>> entry : renderingResults.entrySet()) {
                 // Quick and dirty frustum culling.
