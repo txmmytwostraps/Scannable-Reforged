@@ -1,9 +1,9 @@
 [versions]
-minecraft = "1.20.4"
-parchment-minecraft = "1.20.4"
-parchment-mappings = "2024.02.25"
+minecraft = "1.21.1"
+parchment-minecraft = "1.21.1"
+parchment-mappings = "2024.11.17"
 
-architectury = "11.1.17"
+architectury = "13.0.8"
 
 fabric-loader = "0.15.10"
 fabric-api = "0.97.0+1.20.4"
@@ -13,11 +13,11 @@ fabric-tooltipfix = "1.1.1-1.20"
 
 forge-platform = "1.20.4-49.0.41"
 
-neoforge-platform = "20.4.227"
-neoforge-loader = "2"
+neoforge-platform = "21.1.233"
+neoforge-loader = "1"
 
 [plugins]
-loom = { id = "dev.architectury.loom", version = "1.6-SNAPSHOT" }
+loom = { id = "dev.architectury.loom", version = "1.7-SNAPSHOT" }
 architectury = { id = "architectury-plugin", version = "3.4-SNAPSHOT" }
 shadow = { id = "com.github.johnrengelman.shadow", version = "8.1.1" }
 spotless = { id = "com.diffplug.spotless", version = "6.22.0" }
