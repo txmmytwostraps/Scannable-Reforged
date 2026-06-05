@@ -10,6 +10,7 @@ displayName = "Scannable Reforged"
 displayURL = "https://github.com/txmmytwostraps/Scannable-Reforged"
 logoFile = "logo.png"
 authors = "Sangar (original author), txmmytwostraps (NeoForge 1.21.1 port)"
+credits = 'Fork of Scannable by Florian "Sangar" Nücke (MightyPirates). Original: https://github.com/MightyPirates/Scannable'
 description = '''
 Scan the area for points of interest. Unofficial NeoForge 1.21.1 fork of Scannable by Florian "Sangar" Nücke.
 '''
