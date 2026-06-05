@@ -13,7 +13,7 @@ import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.util.Mth;
 import net.minecraft.world.Container;
 import net.minecraft.world.InteractionHand;
-import net.minecraft.world.InteractionResultHolder;
+import net.minecraft.world.InteractionResult;
 import net.minecraft.world.MenuProvider;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.player.Inventory;
@@ -68,7 +68,7 @@ public final class ScannerItem extends ModItem {
     }
 
     @Override
-    public InteractionResultHolder<ItemStack> use(final Level level, final Player player, final InteractionHand hand) {
+    public InteractionResult use(final Level level, final Player player, final InteractionHand hand) {
         final ItemStack stack = player.getItemInHand(hand);
         if (player.isShiftKeyDown()) {
             if (!level.isClientSide() && player instanceof ServerPlayer serverPlayer) {
@@ -91,7 +91,7 @@ public final class ScannerItem extends ModItem {
                     player.displayClientMessage(Strings.MESSAGE_NO_SCAN_MODULES, true);
                 }
                 player.getCooldowns().addCooldown(this, 10);
-                return InteractionResultHolder.fail(stack);
+                return InteractionResult.FAIL;
             }
 
             if (!tryConsumeEnergy(player, stack, modules, true)) {
@@ -99,7 +99,7 @@ public final class ScannerItem extends ModItem {
                     player.displayClientMessage(Strings.MESSAGE_NOT_ENOUGH_ENERGY, true);
                 }
                 player.getCooldowns().addCooldown(this, 10);
-                return InteractionResultHolder.fail(stack);
+                return InteractionResult.FAIL;
             }
 
             player.startUsingItem(hand);
@@ -109,7 +109,7 @@ public final class ScannerItem extends ModItem {
             }
         }
 
-        return InteractionResultHolder.success(stack);
+        return InteractionResult.SUCCESS;
     }
 
     @Override

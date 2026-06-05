@@ -12,7 +12,7 @@ import net.minecraft.client.gui.screens.inventory.AbstractContainerScreen;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.Identifier;
 import net.minecraft.world.entity.player.Inventory;
-import net.minecraft.world.inventory.ClickType;
+import net.minecraft.world.inventory.ContainerInput;
 import net.minecraft.world.inventory.Slot;
 import net.minecraft.world.item.ItemStack;
 
@@ -125,13 +125,13 @@ public abstract class AbstractConfigurableScannerModuleContainerScreen<TContaine
     }
 
     @Override
-    protected void slotClicked(@Nullable final Slot slot, final int slotId, final int mouseButton, final ClickType type) {
+    protected void slotClicked(@Nullable final Slot slot, final int slotId, final int mouseButton, final ContainerInput type) {
         if (slot != null) {
             final ItemStack heldItem = getHeldItem();
             if (slot.getItem() == heldItem) {
                 return;
             }
-            if (type == ClickType.SWAP && inventory.getItem(mouseButton) == heldItem) {
+            if (type == ContainerInput.SWAP && inventory.getItem(mouseButton) == heldItem) {
                 return;
             }
         }

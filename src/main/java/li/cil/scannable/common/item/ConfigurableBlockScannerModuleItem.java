@@ -14,7 +14,6 @@ import net.minecraft.resources.Identifier;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResult;
-import net.minecraft.world.InteractionResultHolder;
 import net.minecraft.world.MenuProvider;
 import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.entity.player.Player;
@@ -147,10 +146,10 @@ public final class ConfigurableBlockScannerModuleItem extends ScannerModuleItem 
     }
 
     @Override
-    public InteractionResultHolder<ItemStack> use(final Level level, final Player player, final InteractionHand hand) {
+    public InteractionResult use(final Level level, final Player player, final InteractionHand hand) {
         final ItemStack stack = player.getItemInHand(hand);
         if (player.isShiftKeyDown()) {
-            return InteractionResultHolder.pass(stack);
+            return InteractionResult.PASS;
         }
 
         if (!level.isClientSide() && player instanceof ServerPlayer serverPlayer) {
@@ -167,7 +166,7 @@ public final class ConfigurableBlockScannerModuleItem extends ScannerModuleItem 
             }, buffer -> buffer.writeEnum(hand));
         }
 
-        return InteractionResultHolder.success(stack);
+        return InteractionResult.SUCCESS;
     }
 
     @Override
@@ -190,7 +189,7 @@ public final class ConfigurableBlockScannerModuleItem extends ScannerModuleItem 
                 player.displayClientMessage(Strings.MESSAGE_BLOCK_IGNORED, true);
             }
             player.getCooldowns().addCooldown(this, 10);
-            return InteractionResult.sidedSuccess(context.getLevel().isClientSide());
+            return InteractionResult.SUCCESS;
         }
 
         if (!addBlock(stack, state.getBlock())) {
@@ -200,6 +199,6 @@ public final class ConfigurableBlockScannerModuleItem extends ScannerModuleItem 
         }
 
         // Always succeed to prevent opening item UI.
-        return InteractionResult.sidedSuccess(context.getLevel().isClientSide());
+        return InteractionResult.SUCCESS;
     }
 }

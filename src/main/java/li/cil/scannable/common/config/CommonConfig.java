@@ -1,7 +1,7 @@
 package li.cil.scannable.common.config;
 
 import li.cil.scannable.util.config.*;
-import net.minecraft.Util;
+import net.minecraft.util.Util;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.resources.Identifier;
 import net.minecraft.world.level.block.Blocks;

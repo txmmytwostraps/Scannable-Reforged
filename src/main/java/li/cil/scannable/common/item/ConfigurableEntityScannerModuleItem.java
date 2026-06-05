@@ -13,7 +13,6 @@ import net.minecraft.resources.Identifier;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResult;
-import net.minecraft.world.InteractionResultHolder;
 import net.minecraft.world.MenuProvider;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.LivingEntity;
@@ -145,10 +144,10 @@ public final class ConfigurableEntityScannerModuleItem extends ScannerModuleItem
     }
 
     @Override
-    public InteractionResultHolder<ItemStack> use(final Level level, final Player player, final InteractionHand hand) {
+    public InteractionResult use(final Level level, final Player player, final InteractionHand hand) {
         final ItemStack stack = player.getItemInHand(hand);
         if (player.isShiftKeyDown()) {
-            return InteractionResultHolder.pass(stack);
+            return InteractionResult.PASS;
         }
 
         if (!level.isClientSide() && player instanceof ServerPlayer serverPlayer) {
@@ -165,7 +164,7 @@ public final class ConfigurableEntityScannerModuleItem extends ScannerModuleItem
             }, buffer -> buffer.writeEnum(hand));
         }
 
-        return InteractionResultHolder.success(stack);
+        return InteractionResult.SUCCESS;
     }
 
     @Override
@@ -181,6 +180,6 @@ public final class ConfigurableEntityScannerModuleItem extends ScannerModuleItem
         }
 
         // Always succeed to prevent opening item UI.
-        return InteractionResult.sidedSuccess(player.level().isClientSide());
+        return InteractionResult.SUCCESS;
     }
 }
