@@ -4,7 +4,7 @@ import li.cil.scannable.api.API;
 import li.cil.scannable.common.item.Items;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.data.PackOutput;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.world.item.Item;
 import net.neoforged.neoforge.client.model.generators.ItemModelBuilder;
 import net.neoforged.neoforge.client.model.generators.ItemModelProvider;
@@ -20,9 +20,9 @@ public final class ModItemModelProvider extends ItemModelProvider {
     @Override
     protected void registerModels() {
         begin(Items.SCANNER.get())
-            .texture("layer0", ResourceLocation.fromNamespaceAndPath(API.MOD_ID, "item/scanner"));
+            .texture("layer0", Identifier.fromNamespaceAndPath(API.MOD_ID, "item/scanner"));
         begin(Items.BLANK_MODULE.get())
-            .texture("layer0", ResourceLocation.fromNamespaceAndPath(API.MOD_ID, "item/blank_module"));
+            .texture("layer0", Identifier.fromNamespaceAndPath(API.MOD_ID, "item/blank_module"));
 
         registerModule(Items.RANGE_MODULE.get());
         registerModule(Items.ENTITY_MODULE.get());
@@ -37,13 +37,13 @@ public final class ModItemModelProvider extends ItemModelProvider {
     }
 
     private ItemModelBuilder begin(final Item item) {
-        return withExistingParent(Objects.requireNonNull(BuiltInRegistries.ITEM.getKey(item)).getPath(), ResourceLocation.parse("item/generated"));
+        return withExistingParent(Objects.requireNonNull(BuiltInRegistries.ITEM.getKey(item)).getPath(), Identifier.parse("item/generated"));
     }
 
     private void registerModule(final Item item) {
         begin(item)
-            .texture("layer0", ResourceLocation.fromNamespaceAndPath(API.MOD_ID, "item/blank_module"))
-            .texture("layer1", ResourceLocation.fromNamespaceAndPath(API.MOD_ID, "item/module_slot"))
-            .texture("layer2", ResourceLocation.fromNamespaceAndPath(API.MOD_ID, "item/" + Objects.requireNonNull(BuiltInRegistries.ITEM.getKey(item)).getPath()));
+            .texture("layer0", Identifier.fromNamespaceAndPath(API.MOD_ID, "item/blank_module"))
+            .texture("layer1", Identifier.fromNamespaceAndPath(API.MOD_ID, "item/module_slot"))
+            .texture("layer2", Identifier.fromNamespaceAndPath(API.MOD_ID, "item/" + Objects.requireNonNull(BuiltInRegistries.ITEM.getKey(item)).getPath()));
     }
 }

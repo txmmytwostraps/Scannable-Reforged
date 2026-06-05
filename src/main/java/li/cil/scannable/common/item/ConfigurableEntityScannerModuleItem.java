@@ -9,7 +9,7 @@ import net.neoforged.api.distmarker.OnlyIn;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceKey;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResult;
@@ -36,7 +36,7 @@ public final class ConfigurableEntityScannerModuleItem extends ScannerModuleItem
     }
 
     public static List<EntityType<?>> getEntityTypes(final ItemStack stack) {
-        final List<ResourceLocation> ids = stack.get(ModDataComponents.ENTITY_TYPES.get());
+        final List<Identifier> ids = stack.get(ModDataComponents.ENTITY_TYPES.get());
         if (ids == null || ids.isEmpty()) {
             return Collections.emptyList();
         }
@@ -57,9 +57,9 @@ public final class ConfigurableEntityScannerModuleItem extends ScannerModuleItem
             return false;
         }
 
-        final ResourceLocation id = registryName.get().location();
+        final Identifier id = registryName.get().location();
 
-        final List<ResourceLocation> list = new ArrayList<>(stack.getOrDefault(ModDataComponents.ENTITY_TYPES.get(), Collections.emptyList()));
+        final List<Identifier> list = new ArrayList<>(stack.getOrDefault(ModDataComponents.ENTITY_TYPES.get(), Collections.emptyList()));
         if (list.contains(id)) {
             return true;
         }
@@ -86,9 +86,9 @@ public final class ConfigurableEntityScannerModuleItem extends ScannerModuleItem
             return;
         }
 
-        final ResourceLocation id = registryName.get().location();
+        final Identifier id = registryName.get().location();
 
-        final List<ResourceLocation> list = new ArrayList<>(stack.getOrDefault(ModDataComponents.ENTITY_TYPES.get(), Collections.emptyList()));
+        final List<Identifier> list = new ArrayList<>(stack.getOrDefault(ModDataComponents.ENTITY_TYPES.get(), Collections.emptyList()));
         final int oldIndex = list.indexOf(id);
         if (oldIndex == index) {
             return;
@@ -116,7 +116,7 @@ public final class ConfigurableEntityScannerModuleItem extends ScannerModuleItem
             return;
         }
 
-        final List<ResourceLocation> list = new ArrayList<>(stack.getOrDefault(ModDataComponents.ENTITY_TYPES.get(), Collections.emptyList()));
+        final List<Identifier> list = new ArrayList<>(stack.getOrDefault(ModDataComponents.ENTITY_TYPES.get(), Collections.emptyList()));
         if (index < list.size()) {
             list.remove(index);
             stack.set(ModDataComponents.ENTITY_TYPES.get(), List.copyOf(list));

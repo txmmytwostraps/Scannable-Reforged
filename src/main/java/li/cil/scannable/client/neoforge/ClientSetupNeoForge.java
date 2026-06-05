@@ -9,7 +9,7 @@ import li.cil.scannable.client.gui.ScannerContainerScreen;
 import li.cil.scannable.client.renderer.OverlayRenderer;
 import li.cil.scannable.client.renderer.ScannerRenderer;
 import li.cil.scannable.common.container.Containers;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.neoforged.api.distmarker.Dist;
 import net.neoforged.api.distmarker.OnlyIn;
 import net.neoforged.bus.api.SubscribeEvent;
@@ -41,7 +41,7 @@ public final class ClientSetupNeoForge {
 
     @SubscribeEvent
     public static void handleRegisterLayersEvent(final RegisterGuiLayersEvent event) {
-        event.registerAboveAll(ResourceLocation.fromNamespaceAndPath(API.MOD_ID, "scanner_results"), (guiGraphics, deltaTracker) -> {
+        event.registerAboveAll(Identifier.fromNamespaceAndPath(API.MOD_ID, "scanner_results"), (guiGraphics, deltaTracker) -> {
             final float partialTick = deltaTracker.getGameTimeDeltaPartialTick(false);
             ScanManager.renderGui(partialTick);
             OverlayRenderer.render(guiGraphics, partialTick);

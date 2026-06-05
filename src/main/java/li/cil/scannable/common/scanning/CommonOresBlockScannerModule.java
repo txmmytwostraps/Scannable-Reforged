@@ -10,7 +10,7 @@ import li.cil.scannable.common.config.CommonConfig;
 import net.neoforged.api.distmarker.Dist;
 import net.neoforged.api.distmarker.OnlyIn;
 import net.minecraft.core.registries.BuiltInRegistries;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.block.state.BlockState;
 
@@ -58,7 +58,7 @@ public enum CommonOresBlockScannerModule implements BlockScannerModule {
         }
 
         final List<Predicate<BlockState>> filters = new ArrayList<>();
-        for (final ResourceLocation location : CommonConfig.commonOreBlocks) {
+        for (final Identifier location : CommonConfig.commonOreBlocks) {
             BuiltInRegistries.BLOCK.getOptional(location).ifPresent(block ->
                 filters.add(new BlockScanFilter(block)));
         }

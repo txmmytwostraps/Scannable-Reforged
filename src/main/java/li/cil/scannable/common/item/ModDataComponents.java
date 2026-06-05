@@ -5,7 +5,7 @@ import li.cil.scannable.util.RegistryUtils;
 import net.minecraft.core.component.DataComponentType;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.network.codec.ByteBufCodecs;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.world.item.component.ItemContainerContents;
 import net.neoforged.neoforge.registries.DeferredHolder;
 import net.neoforged.neoforge.registries.DeferredRegister;
@@ -18,17 +18,17 @@ public final class ModDataComponents {
     // --------------------------------------------------------------------- //
 
     // Configured entity-type ids for the configurable entity scanner module.
-    public static final DeferredHolder<DataComponentType<?>, DataComponentType<List<ResourceLocation>>> ENTITY_TYPES = DATA_COMPONENTS.register("entities", () ->
-        DataComponentType.<List<ResourceLocation>>builder()
-            .persistent(ResourceLocation.CODEC.listOf())
-            .networkSynchronized(ResourceLocation.STREAM_CODEC.apply(ByteBufCodecs.list()))
+    public static final DeferredHolder<DataComponentType<?>, DataComponentType<List<Identifier>>> ENTITY_TYPES = DATA_COMPONENTS.register("entities", () ->
+        DataComponentType.<List<Identifier>>builder()
+            .persistent(Identifier.CODEC.listOf())
+            .networkSynchronized(Identifier.STREAM_CODEC.apply(ByteBufCodecs.list()))
             .build());
 
     // Configured block ids for the configurable block scanner module.
-    public static final DeferredHolder<DataComponentType<?>, DataComponentType<List<ResourceLocation>>> BLOCKS = DATA_COMPONENTS.register("blocks", () ->
-        DataComponentType.<List<ResourceLocation>>builder()
-            .persistent(ResourceLocation.CODEC.listOf())
-            .networkSynchronized(ResourceLocation.STREAM_CODEC.apply(ByteBufCodecs.list()))
+    public static final DeferredHolder<DataComponentType<?>, DataComponentType<List<Identifier>>> BLOCKS = DATA_COMPONENTS.register("blocks", () ->
+        DataComponentType.<List<Identifier>>builder()
+            .persistent(Identifier.CODEC.listOf())
+            .networkSynchronized(Identifier.STREAM_CODEC.apply(ByteBufCodecs.list()))
             .build());
 
     // Whether a configurable module's contents are locked against editing.

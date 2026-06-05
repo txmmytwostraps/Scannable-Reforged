@@ -3,7 +3,7 @@ package li.cil.scannable.util;
 import com.google.common.base.Strings;
 import li.cil.scannable.common.neoforge.ModEventBus;
 import li.cil.scannable.util.config.*;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.neoforged.fml.ModLoadingContext;
 import net.neoforged.fml.config.IConfigSpec;
 import net.neoforged.fml.config.ModConfig;
@@ -47,7 +47,7 @@ public abstract class ConfigManager {
         STRING_CONVERTERS.put(double.class, Pair.of(o -> String.valueOf((double) o), Double::parseDouble));
         STRING_CONVERTERS.put(String.class, Pair.of(s -> (String) s, s -> s));
         STRING_CONVERTERS.put(UUID.class, Pair.of(Object::toString, UUID::fromString));
-        STRING_CONVERTERS.put(ResourceLocation.class, Pair.of(Object::toString, ResourceLocation::parse));
+        STRING_CONVERTERS.put(Identifier.class, Pair.of(Object::toString, Identifier::parse));
     }
 
     // --------------------------------------------------------------------- //

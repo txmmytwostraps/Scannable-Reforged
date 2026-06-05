@@ -13,7 +13,7 @@ import net.neoforged.api.distmarker.OnlyIn;
 import net.minecraft.client.Camera;
 import net.minecraft.client.renderer.MultiBufferSource;
 import net.minecraft.network.chat.Component;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.util.Mth;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.player.Player;
@@ -72,12 +72,12 @@ public final class ScanResultProviderEntity extends AbstractScanResultProvider {
 
             final Vec3 position = entity.position();
             if (center.distanceToSqr(position) < radius * radius) {
-                ResourceLocation icon = API.ICON_INFO;
+                Identifier icon = API.ICON_INFO;
                 boolean hasMatch = false;
                 for (final Predicate<Entity> filter : filters) {
                     if (filter.test(entity)) {
                         hasMatch = true;
-                        final Optional<ResourceLocation> filterIcon = filterToModule.get(filter).getIcon(entity);
+                        final Optional<Identifier> filterIcon = filterToModule.get(filter).getIcon(entity);
                         if (filterIcon.isPresent()) {
                             icon = filterIcon.get();
                             break;
@@ -122,7 +122,7 @@ public final class ScanResultProviderEntity extends AbstractScanResultProvider {
         for (final ScanResult result : results) {
             final ScanResultEntity resultEntity = (ScanResultEntity) result;
             final Component name = resultEntity.entity.getName();
-            final ResourceLocation icon = resultEntity.getIcon();
+            final Identifier icon = resultEntity.getIcon();
             final Vec3 resultPos = resultEntity.entity.getEyePosition(partialTicks);
             final float distance = showDistance ? (float) resultPos.subtract(viewerEyes).length() : 0f;
             renderIconLabel(bufferSource, poseStack, yaw, pitch, lookVec, viewerEyes, distance, resultPos, icon, name);
@@ -142,8 +142,8 @@ public final class ScanResultProviderEntity extends AbstractScanResultProvider {
 
     // --------------------------------------------------------------------- //
 
-    private record ScanResultEntity(Entity entity, ResourceLocation icon) implements ScanResult {
-        public ResourceLocation getIcon() {
+    private record ScanResultEntity(Entity entity, Identifier icon) implements ScanResult {
+        public Identifier getIcon() {
             return icon;
         }
 

@@ -3,7 +3,7 @@ package li.cil.scannable.common.config;
 import li.cil.scannable.util.config.*;
 import net.minecraft.Util;
 import net.minecraft.core.registries.BuiltInRegistries;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.world.level.block.Blocks;
 import net.neoforged.neoforge.common.Tags;
 
@@ -102,8 +102,8 @@ public final class CommonConfig {
         Registry names of blocks that should be ignored.
         Blocks in this list will be excluded from the default ore list based on the forge:ores
         tag and it will be impossible to tune the entity module to this block.""")
-    @ItemType(ResourceLocation.class)
-    public static Set<ResourceLocation> ignoredBlocks = Util.make(new HashSet<>(), c -> {
+    @ItemType(Identifier.class)
+    public static Set<Identifier> ignoredBlocks = Util.make(new HashSet<>(), c -> {
         c.add(BuiltInRegistries.BLOCK.getKey(Blocks.COMMAND_BLOCK));
     });
 
@@ -112,25 +112,25 @@ public final class CommonConfig {
         Tag names of block tags that should be ignored.
         Blocks matching a tag in this list will be excluded from the default ore list based on the
         forge:ores tag and it will be impossible to tune the entity module to this block.""")
-    @ItemType(ResourceLocation.class)
-    public static Set<ResourceLocation> ignoredBlockTags = new HashSet<>();
+    @ItemType(Identifier.class)
+    public static Set<Identifier> ignoredBlockTags = new HashSet<>();
 
     @Path("ores") @WorldRestart
     @Comment("Registry names of blocks considered 'common ores', requiring the common ore scanner module.")
-    @ItemType(ResourceLocation.class)
-    public static Set<ResourceLocation> commonOreBlocks = Util.make(new HashSet<>(), c -> {
+    @ItemType(Identifier.class)
+    public static Set<Identifier> commonOreBlocks = Util.make(new HashSet<>(), c -> {
         c.add(BuiltInRegistries.BLOCK.getKey(Blocks.CLAY));
     });
 
     @Path("ores") @WorldRestart
     @Comment("Block tags of blocks considered 'common ores', requiring the common ore scanner module.")
-    @ItemType(ResourceLocation.class)
-    public static Set<ResourceLocation> commonOreBlockTags = getDefaultCommonOreTags();
+    @ItemType(Identifier.class)
+    public static Set<Identifier> commonOreBlockTags = getDefaultCommonOreTags();
 
     @Path("ores") @WorldRestart
     @Comment("Registry names of blocks considered 'rare ores', requiring the rare ore scanner module.")
-    @ItemType(ResourceLocation.class)
-    public static Set<ResourceLocation> rareOreBlocks = Util.make(new HashSet<>(), c -> {
+    @ItemType(Identifier.class)
+    public static Set<Identifier> rareOreBlocks = Util.make(new HashSet<>(), c -> {
         c.add(BuiltInRegistries.BLOCK.getKey(Blocks.GLOWSTONE));
     });
 
@@ -139,23 +139,23 @@ public final class CommonConfig {
         Block tags of blocks considered 'rare ores', requiring the common ore scanner module.
         Any block with the forge:ores tag is implicitly in this list, unless the block also
         matches an ignored or common ore block tag, or is an ignored or common block.""")
-    @ItemType(ResourceLocation.class)
-    public static Set<ResourceLocation> rareOreBlockTags = new HashSet<>();
+    @ItemType(Identifier.class)
+    public static Set<Identifier> rareOreBlockTags = new HashSet<>();
 
     @Path("fluids") @WorldRestart
     @Comment("Fluid tags of fluids that should be ignored.")
-    @ItemType(ResourceLocation.class)
-    public static Set<ResourceLocation> ignoredFluidTags = new HashSet<>();
+    @ItemType(Identifier.class)
+    public static Set<Identifier> ignoredFluidTags = new HashSet<>();
 
     @Path("chests") @WorldRestart
     @Comment("Registry names of blocks considered 'chests', requiring the chest scanner module.")
-    @ItemType(ResourceLocation.class)
-    public static Set<ResourceLocation> commonChestBlocks = new HashSet<>();
+    @ItemType(Identifier.class)
+    public static Set<Identifier> commonChestBlocks = new HashSet<>();
 
     @Path("chests") @WorldRestart
     @Comment("Registry names of blocks considered 'chests', requiring the chest scanner module.")
-    @ItemType(ResourceLocation.class)
-    public static Set<ResourceLocation> commonChestTags = getDefaultChestsTags();
+    @ItemType(Identifier.class)
+    public static Set<Identifier> commonChestTags = getDefaultChestsTags();
 
     @Path("spawners") @WorldRestart
     @Comment("""
@@ -163,32 +163,32 @@ public final class CommonConfig {
         Defaults to the vanilla mob spawner, which also covers mods that enhance it in place
         (e.g. Apotheosis). To also detect trial chambers, add minecraft:trial_spawner and
         minecraft:vault; to detect a mod's separate spawner block, add its registry name here.""")
-    @ItemType(ResourceLocation.class)
-    public static Set<ResourceLocation> spawnerBlocks = Util.make(new HashSet<>(), c -> {
+    @ItemType(Identifier.class)
+    public static Set<Identifier> spawnerBlocks = Util.make(new HashSet<>(), c -> {
         c.add(BuiltInRegistries.BLOCK.getKey(Blocks.SPAWNER));
     });
 
     @Path("spawners") @WorldRestart
     @Comment("Block tags of blocks considered 'spawners', requiring the spawner scanner module.")
-    @ItemType(ResourceLocation.class)
-    public static Set<ResourceLocation> spawnerBlockTags = new HashSet<>();
+    @ItemType(Identifier.class)
+    public static Set<Identifier> spawnerBlockTags = new HashSet<>();
 
-    private static Set<ResourceLocation> getDefaultCommonOreTags() {
+    private static Set<Identifier> getDefaultCommonOreTags() {
         return Util.make(new HashSet<>(), c -> {
             c.add(Tags.Blocks.ORES_COAL.location());
             c.add(Tags.Blocks.ORES_IRON.location());
             c.add(Tags.Blocks.ORES_REDSTONE.location());
             c.add(Tags.Blocks.ORES_QUARTZ.location());
-            c.add(ResourceLocation.fromNamespaceAndPath("c", "ores/copper"));
-            c.add(ResourceLocation.fromNamespaceAndPath("c", "ores/tin"));
+            c.add(Identifier.fromNamespaceAndPath("c", "ores/copper"));
+            c.add(Identifier.fromNamespaceAndPath("c", "ores/tin"));
         });
     }
 
-    private static Set<ResourceLocation> getDefaultChestsTags() {
+    private static Set<Identifier> getDefaultChestsTags() {
         return Util.make(new HashSet<>(), c -> {
             c.add(Tags.Blocks.CHESTS.location());
             c.add(Tags.Blocks.BARRELS.location());
-            c.add(ResourceLocation.fromNamespaceAndPath("minecraft", "shulker_boxes"));
+            c.add(Identifier.fromNamespaceAndPath("minecraft", "shulker_boxes"));
         });
     }
 }

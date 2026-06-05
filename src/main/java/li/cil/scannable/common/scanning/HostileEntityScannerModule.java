@@ -8,7 +8,7 @@ import li.cil.scannable.client.scanning.filter.HostileEntityScanFilter;
 import li.cil.scannable.common.config.CommonConfig;
 import net.neoforged.api.distmarker.Dist;
 import net.neoforged.api.distmarker.OnlyIn;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.item.ItemStack;
 
@@ -31,7 +31,7 @@ public enum HostileEntityScannerModule implements EntityScannerModule {
 
     @OnlyIn(Dist.CLIENT)
     @Override
-    public Optional<ResourceLocation> getIcon(final Entity entity) {
+    public Optional<Identifier> getIcon(final Entity entity) {
         return Optional.of(API.ICON_WARNING);
     }
 

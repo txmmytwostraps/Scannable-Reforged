@@ -15,14 +15,14 @@ import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.renderer.GameRenderer;
 import net.minecraft.network.chat.Component;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.util.Mth;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
 
 @OnlyIn(Dist.CLIENT)
 public final class OverlayRenderer {
-    private static final ResourceLocation PROGRESS = ResourceLocation.fromNamespaceAndPath(API.MOD_ID, "textures/gui/overlay/scanner_progress.png");
+    private static final Identifier PROGRESS = Identifier.fromNamespaceAndPath(API.MOD_ID, "textures/gui/overlay/scanner_progress.png");
 
     public static void render(final GuiGraphics graphics, final float partialTick) {
         final Minecraft mc = Minecraft.getInstance();

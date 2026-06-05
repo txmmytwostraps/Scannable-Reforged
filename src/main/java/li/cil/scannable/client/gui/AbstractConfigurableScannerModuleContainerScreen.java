@@ -10,7 +10,7 @@ import net.neoforged.api.distmarker.OnlyIn;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.screens.inventory.AbstractContainerScreen;
 import net.minecraft.network.chat.Component;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.inventory.ClickType;
 import net.minecraft.world.inventory.Slot;
@@ -21,7 +21,7 @@ import java.util.List;
 
 @OnlyIn(Dist.CLIENT)
 public abstract class AbstractConfigurableScannerModuleContainerScreen<TContainer extends AbstractModuleContainerMenu, TItem> extends AbstractContainerScreen<TContainer> {
-    private static final ResourceLocation BACKGROUND = ResourceLocation.fromNamespaceAndPath(API.MOD_ID, "textures/gui/container/configurable_module.png");
+    private static final Identifier BACKGROUND = Identifier.fromNamespaceAndPath(API.MOD_ID, "textures/gui/container/configurable_module.png");
     public static final int SLOTS_ORIGIN_X = 62;
     public static final int SLOTS_ORIGIN_Y = 20;
     public static final int SLOT_SIZE = 18;

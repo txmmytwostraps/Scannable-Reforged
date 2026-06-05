@@ -14,7 +14,7 @@ import net.minecraft.client.renderer.MultiBufferSource;
 import net.minecraft.client.renderer.RenderStateShard;
 import net.minecraft.client.renderer.RenderType;
 import net.minecraft.network.chat.Component;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.util.Mth;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
@@ -70,7 +70,7 @@ public abstract class AbstractScanResultProvider implements ScanResultProvider {
      * @param icon            the icon to display.
      * @param label           the label text. May be null.
      */
-    protected static void renderIconLabel(final MultiBufferSource bufferSource, final PoseStack poseStack, final float yaw, final float pitch, final Vec3 lookVec, final Vec3 viewerEyes, final float displayDistance, final Vec3 resultPos, final ResourceLocation icon, @Nullable final Component label) {
+    protected static void renderIconLabel(final MultiBufferSource bufferSource, final PoseStack poseStack, final float yaw, final float pitch, final Vec3 lookVec, final Vec3 viewerEyes, final float displayDistance, final Vec3 resultPos, final Identifier icon, @Nullable final Component label) {
         final Vec3 toResult = resultPos.subtract(viewerEyes);
         final float distance = (float) toResult.length();
         final float lookDirDot = (float) lookVec.dot(toResult.normalize());
@@ -144,7 +144,7 @@ public abstract class AbstractScanResultProvider implements ScanResultProvider {
                 .createCompositeState(false));
     }
 
-    protected static RenderType getRenderLayer(final ResourceLocation textureLocation) {
+    protected static RenderType getRenderLayer(final Identifier textureLocation) {
         return RenderType.create("scan_result",
             DefaultVertexFormat.POSITION_TEX,
             VertexFormat.Mode.QUADS, 65536,

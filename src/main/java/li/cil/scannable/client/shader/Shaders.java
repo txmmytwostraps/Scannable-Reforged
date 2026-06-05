@@ -8,7 +8,7 @@ import net.neoforged.api.distmarker.Dist;
 import net.neoforged.api.distmarker.OnlyIn;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.ShaderInstance;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.server.packs.resources.ReloadableResourceManager;
 import net.minecraft.server.packs.resources.ResourceManager;
 import net.minecraft.server.packs.resources.ResourceManagerReloadListener;
@@ -91,7 +91,7 @@ public final class Shaders implements ResourceManagerReloadListener {
             }
 
             try {
-                shader = new ShaderInstance(location -> provider.getResource(ResourceLocation.fromNamespaceAndPath(API.MOD_ID, location.getPath())).or(() -> provider.getResource(location)), name, format);
+                shader = new ShaderInstance(location -> provider.getResource(Identifier.fromNamespaceAndPath(API.MOD_ID, location.getPath())).or(() -> provider.getResource(location)), name, format);
             } catch (final Exception e) {
                 LOGGER.error(e);
             }
