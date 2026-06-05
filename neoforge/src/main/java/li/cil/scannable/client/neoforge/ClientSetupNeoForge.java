@@ -28,7 +28,7 @@ public final class ClientSetupNeoForge {
 
     @SubscribeEvent
     public static void handleRegisterOverlaysEvent(final RegisterGuiOverlaysEvent event) {
-        event.registerAboveAll(new ResourceLocation(API.MOD_ID, "scanner_results"), (gui, poseStack, partialTick, width, height) -> {
+        event.registerAboveAll(ResourceLocation.fromNamespaceAndPath(API.MOD_ID, "scanner_results"), (gui, poseStack, partialTick, width, height) -> {
             ScanManager.renderGui(partialTick);
             OverlayRenderer.render(poseStack, partialTick);
         });

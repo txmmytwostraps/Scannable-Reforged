@@ -17,7 +17,7 @@ import net.neoforged.neoforge.items.wrapper.InvWrapper;
 @Mod.EventBusSubscriber(modid = API.MOD_ID, bus = Mod.EventBusSubscriber.Bus.MOD)
 public final class Capabilities {
     public static final class ScannerModule {
-        public static final ItemCapability<li.cil.scannable.api.scanning.ScannerModule, Void> ITEM = ItemCapability.createVoid(new ResourceLocation(API.MOD_ID, "scanner_module"), li.cil.scannable.api.scanning.ScannerModule.class);
+        public static final ItemCapability<li.cil.scannable.api.scanning.ScannerModule, Void> ITEM = ItemCapability.createVoid(ResourceLocation.fromNamespaceAndPath(API.MOD_ID, "scanner_module"), li.cil.scannable.api.scanning.ScannerModule.class);
     }
 
     // --------------------------------------------------------------------- //

@@ -14,8 +14,8 @@ public final class CommonConfigImpl {
             c.add(Tags.Blocks.ORES_IRON.location());
             c.add(Tags.Blocks.ORES_REDSTONE.location());
             c.add(Tags.Blocks.ORES_QUARTZ.location());
-            c.add(new ResourceLocation("forge", "ores/copper"));
-            c.add(new ResourceLocation("forge", "ores/tin"));
+            c.add(ResourceLocation.fromNamespaceAndPath("forge", "ores/copper"));
+            c.add(ResourceLocation.fromNamespaceAndPath("forge", "ores/tin"));
         });
     }
 
@@ -23,7 +23,7 @@ public final class CommonConfigImpl {
         return Util.make(new HashSet<>(), c -> {
             c.add(Tags.Blocks.CHESTS.location());
             c.add(Tags.Blocks.BARRELS.location());
-            c.add(new ResourceLocation("minecraft", "shulker_boxes"));
+            c.add(ResourceLocation.fromNamespaceAndPath("minecraft", "shulker_boxes"));
         });
     }
 }
