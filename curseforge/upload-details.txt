@@ -1,0 +1,24 @@
+CurseForge upload details — Scannable Reforged 1.0.0
+=====================================================
+
+Project name:     Scannable Reforged
+Game version:     1.21.1
+Mod loader:       NeoForge
+Release type:     Release
+License:          MIT   (select "MIT License" in the dropdown; the LICENSE text is also packaged inside the jar as LICENSE_scannable)
+Categories:       Armor, Tools, and Weapons  +  Map and Information
+Source/Issues:    https://github.com/txmmytwostraps/Scannable-Reforged   (make the repo public first, or the links 404)
+
+File to upload:   ScannableReforged-MC1.21.1-neoforge-1.0.0.jar
+  (in your Downloads, and at neoforge/build/libs/ in the repo)
+
+Logo / avatar:    Scannable-Reforged-logo.png   (in your Downloads, 512x512)
+
+Listing copy to paste:
+  - Summary    -> curseforge/summary.txt
+  - Description-> curseforge/description.md
+  - Changelog  -> curseforge/changelog.md
+
+Dependencies to declare on the file (optional but recommended):
+  - Architectury API   (required)
+  (NeoForge + Minecraft 1.21.1 are covered by the game-version/loader selection.)

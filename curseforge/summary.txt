@@ -1,0 +1,1 @@
+Scannable Reforged — Scannable ported to 1.21.1 (NeoForge), with a new spawner-scanning module and a larger scanner energy buffer. A fork of Scannable by Florian "Sangar" Nücke.
