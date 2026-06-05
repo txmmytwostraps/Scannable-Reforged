@@ -47,10 +47,6 @@ subprojects {
             forRepository { maven("https://maven.parchmentmc.org") }
             filter { includeGroupByRegex("org\\.parchmentmc.*") }
         }
-        exclusiveContent {
-            forRepository { maven("https://api.modrinth.com/maven") }
-            filter { includeGroup("maven.modrinth") }
-        }
     }
 
     dependencies {
