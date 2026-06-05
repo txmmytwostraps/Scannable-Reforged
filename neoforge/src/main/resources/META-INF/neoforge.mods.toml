@@ -1,17 +1,17 @@
 modLoader = "javafml"
 loaderVersion = "[${loaderVersion},)"
-issueTrackerURL = "https://github.com/MightyPirates/Scannable/issues"
+issueTrackerURL = "https://github.com/txmmytwostraps/Scannable-Reforged/issues"
 license = "MIT"
 
 [[mods]]
 modId = "scannable"
 version = "${version}"
 displayName = "Scannable Reforged"
-displayURL = "https://github.com/MightyPirates/Scannable"
+displayURL = "https://github.com/txmmytwostraps/Scannable-Reforged"
 logoFile = "logo.png"
-authors = "Sangar"
+authors = "Sangar (original author), txmmytwostraps (NeoForge 1.21.1 port)"
 description = '''
-Scan the area for points of interest.
+Scan the area for points of interest. Unofficial NeoForge 1.21.1 fork of Scannable by Florian "Sangar" Nücke.
 '''
 
 [[dependencies.scannable]]
@@ -40,10 +40,3 @@ config = "scannable-common.mixins.json"
 
 [[mixins]]
 config = "scannable.mixins.json"
-
-[mc-publish]
-modrinth = "YqFnwJHf"
-curseforge = 266784
-dependencies = [
-    "architectury@>=${architecturyVersion}(required){modrinth:lhGA9TYQ}{curseforge:419699}"
-]
