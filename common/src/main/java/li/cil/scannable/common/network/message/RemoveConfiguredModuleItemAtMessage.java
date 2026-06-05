@@ -1,24 +1,23 @@
 package li.cil.scannable.common.network.message;
 
 import dev.architectury.networking.NetworkManager;
+import li.cil.scannable.api.API;
 import li.cil.scannable.common.container.AbstractModuleContainerMenu;
-import net.minecraft.network.FriendlyByteBuf;
+import net.minecraft.network.RegistryFriendlyByteBuf;
+import net.minecraft.network.codec.ByteBufCodecs;
+import net.minecraft.network.codec.StreamCodec;
+import net.minecraft.network.protocol.common.custom.CustomPacketPayload;
+import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.level.ServerPlayer;
 
-public final class RemoveConfiguredModuleItemAtMessage extends AbstractMessage {
-    private int windowId;
-    private int index;
+public record RemoveConfiguredModuleItemAtMessage(int windowId, int index) implements AbstractMessage {
+    public static final CustomPacketPayload.Type<RemoveConfiguredModuleItemAtMessage> TYPE =
+        new CustomPacketPayload.Type<>(ResourceLocation.fromNamespaceAndPath(API.MOD_ID, "remove_module_item"));
 
-    // --------------------------------------------------------------------- //
-
-    public RemoveConfiguredModuleItemAtMessage(final int windowId, final int index) {
-        this.windowId = windowId;
-        this.index = index;
-    }
-
-    public RemoveConfiguredModuleItemAtMessage(final FriendlyByteBuf buffer) {
-        super(buffer);
-    }
+    public static final StreamCodec<RegistryFriendlyByteBuf, RemoveConfiguredModuleItemAtMessage> STREAM_CODEC = StreamCodec.composite(
+        ByteBufCodecs.VAR_INT, RemoveConfiguredModuleItemAtMessage::windowId,
+        ByteBufCodecs.VAR_INT, RemoveConfiguredModuleItemAtMessage::index,
+        RemoveConfiguredModuleItemAtMessage::new);
 
     // --------------------------------------------------------------------- //
 
@@ -33,14 +32,7 @@ public final class RemoveConfiguredModuleItemAtMessage extends AbstractMessage {
     }
 
     @Override
-    public void fromBytes(final FriendlyByteBuf buffer) {
-        windowId = buffer.readByte();
-        index = buffer.readByte();
-    }
-
-    @Override
-    public void toBytes(final FriendlyByteBuf buffer) {
-        buffer.writeByte(windowId);
-        buffer.writeByte(index);
+    public CustomPacketPayload.Type<? extends CustomPacketPayload> type() {
+        return TYPE;
     }
 }
