@@ -6,7 +6,6 @@ import com.mojang.blaze3d.pipeline.TextureTarget;
 import com.mojang.blaze3d.platform.TextureUtil;
 import com.mojang.blaze3d.systems.RenderSystem;
 import com.mojang.blaze3d.vertex.*;
-import dev.architectury.injectables.annotations.ExpectPlatform;
 import li.cil.scannable.client.ScanManager;
 import li.cil.scannable.client.shader.Shaders;
 import net.neoforged.api.distmarker.Dist;
@@ -152,8 +151,15 @@ public enum ScannerRenderer {
         }
     }
 
-    @ExpectPlatform
     private static DepthOnlyRenderTarget copyBufferSettings(final RenderTarget mainRenderTarget, final DepthOnlyRenderTarget depthRenderTarget) {
-        throw new AssertionError();
+        if (mainRenderTarget.isStencilEnabled()) {
+            depthRenderTarget.enableStencil();
+            return depthRenderTarget;
+        } else if (depthRenderTarget.isStencilEnabled()) {
+            depthRenderTarget.destroyBuffers();
+            return new DepthOnlyRenderTarget(depthRenderTarget.width, depthRenderTarget.height);
+        } else {
+            return depthRenderTarget;
+        }
     }
 }

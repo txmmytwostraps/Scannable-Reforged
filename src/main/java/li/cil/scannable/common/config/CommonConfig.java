@@ -1,11 +1,11 @@
 package li.cil.scannable.common.config;
 
-import dev.architectury.injectables.annotations.ExpectPlatform;
 import li.cil.scannable.util.config.*;
 import net.minecraft.Util;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.level.block.Blocks;
+import net.neoforged.neoforge.common.Tags;
 
 import java.util.HashSet;
 import java.util.Set;
@@ -173,13 +173,22 @@ public final class CommonConfig {
     @ItemType(ResourceLocation.class)
     public static Set<ResourceLocation> spawnerBlockTags = new HashSet<>();
 
-    @ExpectPlatform
     private static Set<ResourceLocation> getDefaultCommonOreTags() {
-        throw new AssertionError();
+        return Util.make(new HashSet<>(), c -> {
+            c.add(Tags.Blocks.ORES_COAL.location());
+            c.add(Tags.Blocks.ORES_IRON.location());
+            c.add(Tags.Blocks.ORES_REDSTONE.location());
+            c.add(Tags.Blocks.ORES_QUARTZ.location());
+            c.add(ResourceLocation.fromNamespaceAndPath("c", "ores/copper"));
+            c.add(ResourceLocation.fromNamespaceAndPath("c", "ores/tin"));
+        });
     }
 
-    @ExpectPlatform
     private static Set<ResourceLocation> getDefaultChestsTags() {
-        throw new AssertionError();
+        return Util.make(new HashSet<>(), c -> {
+            c.add(Tags.Blocks.CHESTS.location());
+            c.add(Tags.Blocks.BARRELS.location());
+            c.add(ResourceLocation.fromNamespaceAndPath("minecraft", "shulker_boxes"));
+        });
     }
 }

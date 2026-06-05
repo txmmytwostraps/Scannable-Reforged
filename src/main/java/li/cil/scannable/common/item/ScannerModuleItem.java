@@ -1,7 +1,7 @@
 package li.cil.scannable.common.item;
 
-import dev.architectury.injectables.annotations.ExpectPlatform;
 import li.cil.scannable.api.scanning.ScannerModule;
+import li.cil.scannable.common.neoforge.capabilities.Capabilities;
 import li.cil.scannable.common.config.CommonConfig;
 import li.cil.scannable.common.config.Strings;
 import net.neoforged.api.distmarker.Dist;
@@ -31,9 +31,8 @@ public class ScannerModuleItem extends ModItem {
 
     @SuppressWarnings("Contract")
     @Contract("_ -> !null")
-    @ExpectPlatform
     public static Optional<ScannerModule> getModule(final ItemStack stack) {
-        throw new AssertionError();
+        return Optional.ofNullable(stack.getCapability(Capabilities.ScannerModule.ITEM));
     }
 
     public static int getModuleEnergyCost(final ItemStack stack) {

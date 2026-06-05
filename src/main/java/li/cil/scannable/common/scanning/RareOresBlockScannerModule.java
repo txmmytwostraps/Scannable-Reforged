@@ -1,6 +1,5 @@
 package li.cil.scannable.common.scanning;
 
-import dev.architectury.injectables.annotations.ExpectPlatform;
 import li.cil.scannable.api.scanning.BlockScannerModule;
 import li.cil.scannable.api.scanning.ScanResultProvider;
 import li.cil.scannable.client.scanning.ScanResultProviders;
@@ -11,6 +10,7 @@ import li.cil.scannable.common.config.CommonConfig;
 import li.cil.scannable.common.scanning.filter.IgnoredBlocks;
 import net.neoforged.api.distmarker.Dist;
 import net.neoforged.api.distmarker.OnlyIn;
+import net.neoforged.neoforge.common.Tags;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.tags.TagKey;
@@ -82,10 +82,9 @@ public enum RareOresBlockScannerModule implements BlockScannerModule {
         filter = new BlockCacheScanFilter(filters);
     }
 
-    @ExpectPlatform
     @SuppressWarnings("Contract")
     @Contract("_ -> !null")
     private static TagKey<Block> getTopLevelOreTag() {
-        throw new AssertionError();
+        return Tags.Blocks.ORES;
     }
 }
