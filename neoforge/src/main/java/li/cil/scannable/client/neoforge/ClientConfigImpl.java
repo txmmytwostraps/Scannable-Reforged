@@ -21,13 +21,13 @@ public final class ClientConfigImpl {
             c.put(Tags.Blocks.ORES_QUARTZ.location(), MapColor.QUARTZ.col);
 
             // Common modded ores
-            c.put(ResourceLocation.fromNamespaceAndPath("forge", "ores/tin"), MapColor.COLOR_CYAN.col);
-            c.put(ResourceLocation.fromNamespaceAndPath("forge", "ores/copper"), MapColor.TERRACOTTA_ORANGE.col);
-            c.put(ResourceLocation.fromNamespaceAndPath("forge", "ores/lead"), MapColor.TERRACOTTA_BLUE.col);
-            c.put(ResourceLocation.fromNamespaceAndPath("forge", "ores/silver"), MapColor.COLOR_LIGHT_GRAY.col);
-            c.put(ResourceLocation.fromNamespaceAndPath("forge", "ores/nickel"), MapColor.COLOR_LIGHT_BLUE.col);
-            c.put(ResourceLocation.fromNamespaceAndPath("forge", "ores/platinum"), MapColor.TERRACOTTA_WHITE.col);
-            c.put(ResourceLocation.fromNamespaceAndPath("forge", "ores/mithril"), MapColor.COLOR_PURPLE.col);
+            c.put(ResourceLocation.fromNamespaceAndPath("c", "ores/tin"), MapColor.COLOR_CYAN.col);
+            c.put(ResourceLocation.fromNamespaceAndPath("c", "ores/copper"), MapColor.TERRACOTTA_ORANGE.col);
+            c.put(ResourceLocation.fromNamespaceAndPath("c", "ores/lead"), MapColor.TERRACOTTA_BLUE.col);
+            c.put(ResourceLocation.fromNamespaceAndPath("c", "ores/silver"), MapColor.COLOR_LIGHT_GRAY.col);
+            c.put(ResourceLocation.fromNamespaceAndPath("c", "ores/nickel"), MapColor.COLOR_LIGHT_BLUE.col);
+            c.put(ResourceLocation.fromNamespaceAndPath("c", "ores/platinum"), MapColor.TERRACOTTA_WHITE.col);
+            c.put(ResourceLocation.fromNamespaceAndPath("c", "ores/mithril"), MapColor.COLOR_PURPLE.col);
         });
     }
 }

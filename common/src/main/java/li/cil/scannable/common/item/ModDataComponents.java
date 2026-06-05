@@ -38,6 +38,13 @@ public final class ModDataComponents {
             .networkSynchronized(ByteBufCodecs.BOOL)
             .build());
 
+    // Energy stored in a scanner item.
+    public static final RegistrySupplier<DataComponentType<Integer>> ENERGY = DATA_COMPONENTS.register("energy", () ->
+        DataComponentType.<Integer>builder()
+            .persistent(Codec.INT)
+            .networkSynchronized(ByteBufCodecs.INT)
+            .build());
+
     // Modules installed in a scanner item.
     public static final RegistrySupplier<DataComponentType<ItemContainerContents>> MODULES = DATA_COMPONENTS.register("modules", () ->
         DataComponentType.<ItemContainerContents>builder()

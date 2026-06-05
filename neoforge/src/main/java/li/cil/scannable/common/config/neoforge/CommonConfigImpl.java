@@ -14,8 +14,8 @@ public final class CommonConfigImpl {
             c.add(Tags.Blocks.ORES_IRON.location());
             c.add(Tags.Blocks.ORES_REDSTONE.location());
             c.add(Tags.Blocks.ORES_QUARTZ.location());
-            c.add(ResourceLocation.fromNamespaceAndPath("forge", "ores/copper"));
-            c.add(ResourceLocation.fromNamespaceAndPath("forge", "ores/tin"));
+            c.add(ResourceLocation.fromNamespaceAndPath("c", "ores/copper"));
+            c.add(ResourceLocation.fromNamespaceAndPath("c", "ores/tin"));
         });
     }
 

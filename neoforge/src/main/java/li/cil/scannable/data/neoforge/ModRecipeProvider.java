@@ -3,6 +3,8 @@ package li.cil.scannable.data.neoforge;
 import net.minecraft.advancements.critereon.InventoryChangeTrigger;
 import net.minecraft.advancements.critereon.LocationPredicate;
 import net.minecraft.advancements.critereon.PlayerTrigger;
+import net.minecraft.core.HolderLookup;
+import net.minecraft.core.registries.Registries;
 import net.minecraft.data.PackOutput;
 import net.minecraft.data.recipes.*;
 import net.minecraft.tags.TagKey;
@@ -11,15 +13,17 @@ import net.minecraft.world.item.Items;
 import net.minecraft.world.level.levelgen.structure.BuiltinStructures;
 import net.neoforged.neoforge.common.Tags;
 
+import java.util.concurrent.CompletableFuture;
+
 import static li.cil.scannable.common.item.Items.*;
 
 public final class ModRecipeProvider extends RecipeProvider {
-    public ModRecipeProvider(final PackOutput output) {
-        super(output);
+    public ModRecipeProvider(final PackOutput output, final CompletableFuture<HolderLookup.Provider> registries) {
+        super(output, registries);
     }
 
     @Override
-    protected void buildRecipes(final RecipeOutput consumer) {
+    protected void buildRecipes(final RecipeOutput consumer, final HolderLookup.Provider registries) {
         ShapedRecipeBuilder.shaped(RecipeCategory.TOOLS, SCANNER.get())
             .pattern("i i")
             .pattern("brb")
@@ -30,7 +34,7 @@ public final class ModRecipeProvider extends RecipeProvider {
             .define('g', Tags.Items.INGOTS_GOLD)
             .define('q', Tags.Items.GEMS_QUARTZ)
             .group("scanner")
-            .unlockedBy("is_delving", PlayerTrigger.TriggerInstance.located(LocationPredicate.Builder.inStructure(BuiltinStructures.MINESHAFT)))
+            .unlockedBy("is_delving", PlayerTrigger.TriggerInstance.located(LocationPredicate.Builder.inStructure(registries.lookupOrThrow(Registries.STRUCTURE).getOrThrow(BuiltinStructures.MINESHAFT))))
             .save(consumer);
 
         ShapedRecipeBuilder.shaped(RecipeCategory.MISC, BLANK_MODULE.get())
@@ -47,9 +51,9 @@ public final class ModRecipeProvider extends RecipeProvider {
 
         registerModule(RANGE_MODULE.get(), Tags.Items.ENDER_PEARLS).save(consumer);
         registerModule(ENTITY_MODULE.get(), Items.LEAD).save(consumer);
-        registerModule(FRIENDLY_ENTITY_MODULE.get(), Tags.Items.LEATHER).save(consumer);
+        registerModule(FRIENDLY_ENTITY_MODULE.get(), Tags.Items.LEATHERS).save(consumer);
         registerModule(HOSTILE_ENTITY_MODULE.get(), Tags.Items.BONES).save(consumer);
-        registerModule(BLOCK_MODULE.get(), Tags.Items.STONE).save(consumer);
+        registerModule(BLOCK_MODULE.get(), Tags.Items.STONES).save(consumer);
         registerModule(COMMON_ORES_MODULE.get(), Items.COAL).save(consumer);
         registerModule(RARE_ORES_MODULE.get(), Tags.Items.GEMS_DIAMOND).save(consumer);
         registerModule(FLUID_MODULE.get(), Items.WATER_BUCKET).save(consumer);
