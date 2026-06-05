@@ -41,14 +41,14 @@ public enum ScannerRenderer {
         currentCenter = pos;
     }
 
-    public static void render(final PoseStack poseStack) {
-        INSTANCE.doRender(poseStack);
+    public static void render(final Matrix4f viewMatrix) {
+        INSTANCE.doRender(viewMatrix);
     }
 
-    private void doRender(final PoseStack poseStack) {
+    private void doRender(final Matrix4f viewMatrix) {
         if (shouldRender()) {
             grabDepthBuffer();
-            render(poseStack.last().pose());
+            renderEffect(viewMatrix);
         }
     }
 
@@ -67,7 +67,7 @@ public enum ScannerRenderer {
         mainRenderTarget.bindWrite(false);
     }
 
-    private void render(final Matrix4f viewMatrix) {
+    private void renderEffect(final Matrix4f viewMatrix) {
         final ShaderInstance shader = Shaders.getScanEffectShader();
         if (shader == null) {
             return;
