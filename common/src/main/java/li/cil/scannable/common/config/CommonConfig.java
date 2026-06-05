@@ -17,7 +17,7 @@ public final class CommonConfig {
 
     @Path("energy") @WorldRestart @Min(0)
     @Comment("Amount of energy that can be stored in a scanner.")
-    public static int energyCapacityScanner = 5000;
+    public static int energyCapacityScanner = 20000;
 
     @Path("energy") @WorldRestart @Min(0)
     @Comment("Amount of energy used by the range module per scan.")
@@ -55,6 +55,10 @@ public final class CommonConfig {
     @Comment("Amount of energy used by the chest module per scan.")
     public static int energyCostModuleChest = 100;
 
+    @Path("energy") @WorldRestart @Min(0)
+    @Comment("Amount of energy used by the spawner module per scan.")
+    public static int energyCostModuleSpawner = 100;
+
     @Path("range") @WorldRestart @Min(0) @Max(1)
     @Comment("Relative amount of base scan radius added by each installed range module.")
     public static float rangeModifierModuleRange = 0.5f;
@@ -78,6 +82,10 @@ public final class CommonConfig {
     @Path("range") @WorldRestart @Min(0) @Max(1)
     @Comment("Relative effective range of the chest module.")
     public static float rangeModifierModuleChest = 0.25f;
+
+    @Path("range") @WorldRestart @Min(0) @Max(1)
+    @Comment("Relative effective range of the spawner module.")
+    public static float rangeModifierModuleSpawner = 0.25f;
 
     // TODO Migrate to range category in next major version.
     @Path("general") @WorldRestart @Min(16) @Max(128)
@@ -148,6 +156,22 @@ public final class CommonConfig {
     @Comment("Registry names of blocks considered 'chests', requiring the chest scanner module.")
     @ItemType(ResourceLocation.class)
     public static Set<ResourceLocation> commonChestTags = getDefaultChestsTags();
+
+    @Path("spawners") @WorldRestart
+    @Comment("""
+        Registry names of blocks considered 'spawners', requiring the spawner scanner module.
+        Defaults to the vanilla mob spawner, which also covers mods that enhance it in place
+        (e.g. Apotheosis). To also detect trial chambers, add minecraft:trial_spawner and
+        minecraft:vault; to detect a mod's separate spawner block, add its registry name here.""")
+    @ItemType(ResourceLocation.class)
+    public static Set<ResourceLocation> spawnerBlocks = Util.make(new HashSet<>(), c -> {
+        c.add(BuiltInRegistries.BLOCK.getKey(Blocks.SPAWNER));
+    });
+
+    @Path("spawners") @WorldRestart
+    @Comment("Block tags of blocks considered 'spawners', requiring the spawner scanner module.")
+    @ItemType(ResourceLocation.class)
+    public static Set<ResourceLocation> spawnerBlockTags = new HashSet<>();
 
     @ExpectPlatform
     private static Set<ResourceLocation> getDefaultCommonOreTags() {

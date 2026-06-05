@@ -25,6 +25,8 @@
   "item.scannable.entity_module.list": "Configured entities:",
   "item.scannable.chest_module": "Scanner Module: Chests",
   "item.scannable.chest_module.desc": "Detects storage blocks (e.g. chests, barrels, shulker boxes).",
+  "item.scannable.spawner_module": "Scanner Module: Spawners",
+  "item.scannable.spawner_module.desc": "Detects mob spawners.",
   "tooltip.scannable.module.energy_cost": "Energy cost: %s",
   "tooltip.scannable.list_item": "§7- §f%s§r",
 

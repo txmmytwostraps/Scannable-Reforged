@@ -16,6 +16,7 @@ public final class ProviderCacheManager {
         FluidBlockScannerModule.clearCache();
         RareOresBlockScannerModule.clearCache();
         ChestScannerModule.clearCache();
+        SpawnerBlockScannerModule.clearCache();
         IgnoredBlocks.clearCache();
     }
 }

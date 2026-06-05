@@ -58,6 +58,16 @@ public final class ModRecipeProvider extends RecipeProvider {
         registerModule(RARE_ORES_MODULE.get(), Tags.Items.GEMS_DIAMOND).save(consumer);
         registerModule(FLUID_MODULE.get(), Items.WATER_BUCKET).save(consumer);
         registerModule(CHEST_MODULE.get(), Items.CHEST).save(consumer);
+
+        ShapedRecipeBuilder.shaped(RecipeCategory.MISC, SPAWNER_MODULE.get())
+            .pattern("iii")
+            .pattern("ibi")
+            .pattern("iii")
+            .define('i', Items.IRON_BARS)
+            .define('b', BLANK_MODULE.get())
+            .group("scanner_module")
+            .unlockedBy("has_blank_module", InventoryChangeTrigger.TriggerInstance.hasItems(BLANK_MODULE.get()))
+            .save(consumer);
     }
 
     private static ShapelessRecipeBuilder registerModule(final Item item, final TagKey<Item> ingredient) {

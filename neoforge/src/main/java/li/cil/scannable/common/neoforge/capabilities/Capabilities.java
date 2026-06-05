@@ -37,6 +37,7 @@ public final class Capabilities {
             Items.COMMON_ORES_MODULE.get(),
             Items.RARE_ORES_MODULE.get(),
             Items.FLUID_MODULE.get(),
-            Items.CHEST_MODULE.get());
+            Items.CHEST_MODULE.get(),
+            Items.SPAWNER_MODULE.get());
     }
 }
