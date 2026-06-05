@@ -28,9 +28,11 @@ subprojects {
     apply(plugin = rootProject.libs.plugins.architectury.get().pluginId)
     apply(plugin = rootProject.libs.plugins.loom.get().pluginId)
 
-    version = "${modVersion}+${getGitRef()}"
+    // Dev builds (modVersion 0.0.0) get a +<gitref> suffix for traceability;
+    // released builds (-PmodVersion=x.y.z) use the clean version.
+    version = if (modVersion == "0.0.0") "${modVersion}+${getGitRef()}" else modVersion
     group = mavenGroup
-    base.archivesName.set("${modId}-MC${minecraftVersion}-${project.name}")
+    base.archivesName.set("ScannableReforged-MC${minecraftVersion}-${project.name}")
 
     architectury {
         minecraft = minecraftVersion
