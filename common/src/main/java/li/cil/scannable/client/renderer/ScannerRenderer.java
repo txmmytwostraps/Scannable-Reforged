@@ -41,14 +41,14 @@ public enum ScannerRenderer {
         currentCenter = pos;
     }
 
-    public static void render(final Matrix4f viewMatrix) {
-        INSTANCE.doRender(viewMatrix);
+    public static void render(final Matrix4f viewMatrix, final Matrix4f projectionMatrix) {
+        INSTANCE.doRender(viewMatrix, projectionMatrix);
     }
 
-    private void doRender(final Matrix4f viewMatrix) {
+    private void doRender(final Matrix4f viewMatrix, final Matrix4f projectionMatrix) {
         if (shouldRender()) {
             grabDepthBuffer();
-            renderEffect(viewMatrix);
+            renderEffect(viewMatrix, projectionMatrix);
         }
     }
 
@@ -67,7 +67,7 @@ public enum ScannerRenderer {
         mainRenderTarget.bindWrite(false);
     }
 
-    private void renderEffect(final Matrix4f viewMatrix) {
+    private void renderEffect(final Matrix4f viewMatrix, final Matrix4f projectionMatrix) {
         final ShaderInstance shader = Shaders.getScanEffectShader();
         if (shader == null) {
             return;
@@ -75,16 +75,16 @@ public enum ScannerRenderer {
 
         final RenderTarget target = Minecraft.getInstance().getMainRenderTarget();
 
-        updateShaderUniforms(shader, viewMatrix);
+        updateShaderUniforms(shader, viewMatrix, projectionMatrix);
 
         blit(target);
     }
 
-    private void updateShaderUniforms(final ShaderInstance shader, final Matrix4f viewMatrix) {
+    private void updateShaderUniforms(final ShaderInstance shader, final Matrix4f viewMatrix, final Matrix4f projectionMatrix) {
         final Matrix4f invertedViewMatrix = new Matrix4f(viewMatrix);
         invertedViewMatrix.invert();
 
-        final Matrix4f invertedProjectionMatrix = new Matrix4f(RenderSystem.getProjectionMatrix());
+        final Matrix4f invertedProjectionMatrix = new Matrix4f(projectionMatrix);
         invertedProjectionMatrix.invert();
 
         final Vec3 cameraPosition = Minecraft.getInstance().gameRenderer.getMainCamera().getPosition();

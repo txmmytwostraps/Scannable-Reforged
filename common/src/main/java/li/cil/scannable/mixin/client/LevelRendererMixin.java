@@ -16,6 +16,6 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 public class LevelRendererMixin {
     @Inject(method = "renderLevel", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/renderer/OutlineBufferSource;endOutlineBatch()V", shift = At.Shift.BEFORE))
     private void renderLevel(final DeltaTracker deltaTracker, final boolean shouldRenderBlockOutline, final Camera camera, final GameRenderer gameRenderer, final LightTexture lightTexture, final Matrix4f frustumMatrix, final Matrix4f projectionMatrix, final CallbackInfo ci) {
-        ScannerRenderer.render(frustumMatrix);
+        ScannerRenderer.render(frustumMatrix, projectionMatrix);
     }
 }
