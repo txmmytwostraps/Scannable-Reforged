@@ -1,6 +1,5 @@
 package li.cil.scannable.common.item;
 
-import dev.architectury.registry.menu.MenuRegistry;
 import li.cil.scannable.api.scanning.ScannerModule;
 import li.cil.scannable.client.ScanManager;
 import li.cil.scannable.client.audio.SoundManager;
@@ -73,7 +72,7 @@ public final class ScannerItem extends ModItem {
         final ItemStack stack = player.getItemInHand(hand);
         if (player.isShiftKeyDown()) {
             if (!level.isClientSide() && player instanceof ServerPlayer serverPlayer) {
-                MenuRegistry.openExtendedMenu(serverPlayer, new MenuProvider() {
+                serverPlayer.openMenu(new MenuProvider() {
                     @Override
                     public Component getDisplayName() {
                         return stack.getHoverName();

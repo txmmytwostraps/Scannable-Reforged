@@ -1,6 +1,5 @@
 package li.cil.scannable.common.network.message;
 
-import dev.architectury.networking.NetworkManager;
 import li.cil.scannable.api.API;
 import li.cil.scannable.common.container.AbstractModuleContainerMenu;
 import net.minecraft.network.RegistryFriendlyByteBuf;
@@ -9,6 +8,7 @@ import net.minecraft.network.codec.StreamCodec;
 import net.minecraft.network.protocol.common.custom.CustomPacketPayload;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.level.ServerPlayer;
+import net.neoforged.neoforge.network.handling.IPayloadContext;
 
 public record RemoveConfiguredModuleItemAtMessage(int windowId, int index) implements AbstractMessage {
     public static final CustomPacketPayload.Type<RemoveConfiguredModuleItemAtMessage> TYPE =
@@ -22,8 +22,8 @@ public record RemoveConfiguredModuleItemAtMessage(int windowId, int index) imple
     // --------------------------------------------------------------------- //
 
     @Override
-    public void handleMessage(final NetworkManager.PacketContext context) {
-        if (context.getPlayer() instanceof ServerPlayer player &&
+    public void handleMessage(final IPayloadContext context) {
+        if (context.player() instanceof ServerPlayer player &&
             player.containerMenu != null &&
             player.containerMenu.containerId == windowId &&
             player.containerMenu instanceof AbstractModuleContainerMenu) {

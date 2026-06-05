@@ -1,6 +1,5 @@
 package li.cil.scannable.common.item;
 
-import dev.architectury.registry.menu.MenuRegistry;
 import li.cil.scannable.common.config.Constants;
 import li.cil.scannable.common.config.Strings;
 import li.cil.scannable.common.container.BlockModuleContainerMenu;
@@ -155,7 +154,7 @@ public final class ConfigurableBlockScannerModuleItem extends ScannerModuleItem 
         }
 
         if (!level.isClientSide() && player instanceof ServerPlayer serverPlayer) {
-            MenuRegistry.openExtendedMenu(serverPlayer, new MenuProvider() {
+            serverPlayer.openMenu(new MenuProvider() {
                 @Override
                 public Component getDisplayName() {
                     return stack.getHoverName();

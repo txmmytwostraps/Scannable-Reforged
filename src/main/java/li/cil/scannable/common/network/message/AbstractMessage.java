@@ -1,8 +1,8 @@
 package li.cil.scannable.common.network.message;
 
-import dev.architectury.networking.NetworkManager;
 import net.minecraft.network.protocol.common.custom.CustomPacketPayload;
+import net.neoforged.neoforge.network.handling.IPayloadContext;
 
 public interface AbstractMessage extends CustomPacketPayload {
-    void handleMessage(final NetworkManager.PacketContext context);
+    void handleMessage(final IPayloadContext context);
 }

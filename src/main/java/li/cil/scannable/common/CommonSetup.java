@@ -1,7 +1,5 @@
 package li.cil.scannable.common;
 
-import dev.architectury.utils.Env;
-import dev.architectury.utils.EnvExecutor;
 import li.cil.scannable.api.API;
 import li.cil.scannable.client.ClientConfig;
 import li.cil.scannable.client.scanning.ScanResultProviders;
@@ -14,6 +12,8 @@ import li.cil.scannable.common.scanning.ProviderCacheManager;
 import li.cil.scannable.common.tags.ItemTags;
 import li.cil.scannable.util.ConfigManager;
 import li.cil.scannable.util.RegistryUtils;
+import net.neoforged.api.distmarker.Dist;
+import net.neoforged.fml.loading.FMLEnvironment;
 
 public final class CommonSetup {
     public static void initialize() {
@@ -29,8 +29,10 @@ public final class CommonSetup {
         Containers.initialize();
         Network.initialize();
 
-        EnvExecutor.runInEnv(Env.CLIENT, () -> ScanResultProviders::initialize);
-        EnvExecutor.runInEnv(Env.CLIENT, () -> ProviderCacheManager::initialize);
+        if (FMLEnvironment.dist == Dist.CLIENT) {
+            ScanResultProviders.initialize();
+            ProviderCacheManager.initialize();
+        }
 
         RegistryUtils.finish();
 
