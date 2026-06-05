@@ -1,0 +1,39 @@
+{
+  "itemGroup.scannable.common": "Scannable",
+
+  "item.scannable.scanner": "Сканер",
+  "item.scannable.scanner.desc": "Используйте для сканирования местности.",
+  "item.scannable.scanner.energy": "Энергия: %s/%s",
+  "item.scannable.blank_module": "Шаблон Модуля",
+  "item.scannable.range_module": "Модуль Сканера: Дальность",
+  "item.scannable.range_module.desc": "Увеличение дальности сканирования.",
+  "item.scannable.friendly_entity_module": "Модуль Сканера: Животные",
+  "item.scannable.friendly_entity_module.desc": "Определяет животных (не враждебных существ).",
+  "item.scannable.hostile_entity_module": "Модуль Сканера: Монстры",
+  "item.scannable.hostile_entity_module.desc": "Определяет монстров (враждебных существ).",
+  "item.scannable.common_ores_module": "Модуль Сканера: Обычные Руды",
+  "item.scannable.common_ores_module.desc": "Определяет обычные руды (к примеру: уголь, железо).",
+  "item.scannable.rare_ores_module": "Модуль Сканера: Редкие Руды",
+  "item.scannable.rare_ores_module.desc": "Определяет редкие руды (к примеру: алмазы, изумруды).",
+  "item.scannable.block_module": "Модуль Сканера: Блок",
+  "item.scannable.block_module.desc": "Используйте на блоке для настройки модуля.",
+  "item.scannable.block_module.list": "Выбранный Блок:",
+  "item.scannable.fluid_module": "Модуль Сканера: Жидкости",
+  "item.scannable.fluid_module.desc": "Определяет жидкости (к примеру: вода, лава).",
+  "item.scannable.entity_module": "Модуль Сканера: Живые Сущности",
+  "item.scannable.entity_module.desc": "Используйте на сущности для настройки модуля.",
+  "item.scannable.entity_module.list": "Выбранная сущность:",
+
+  "tooltip.scannable.module.energy_cost": "Затраты Энергии: %s",
+
+  "gui.scannable.scanner.active_modules": "Модули",
+  "gui.scannable.scanner.active_modules.desc": "Здесь представлены активные модули, которые будут использоваться при сканировании.",
+  "gui.scannable.scanner.inactive_modules": "Неактивен",
+  "gui.scannable.scanner.inactive_modules.desc": "Это ячейки хранения дополнительных модулей. Они не будут использоваться при сканировании.",
+  "gui.scannable.scanner.progress": "Зарядка... %s%%",
+  "gui.scannable.overlay.distance": "%s (%sm)",
+
+  "message.scannable.no_scan_modules": "Модуль сканирования не установлен.",
+  "message.scannable.not_enough_energy": "Недостаточно энергии.",
+  "message.scannable.block_ignored": "Блок запрещён для сканирования."
+}

@@ -1,0 +1,93 @@
+name: publish
+
+on:
+  release:
+    types: [ published ]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    outputs:
+      mc_version: ${{ steps.split_tag.outputs.mc_version }}
+      mod_version: ${{ steps.split_tag.outputs.mod_version }}
+
+    steps:
+      - name: Extract Version from Tag
+        id: split_tag
+        run: |
+          tag=${{ github.event.release.tag_name }}
+          parts=(${tag//\// })
+          echo "mc_version=${parts[0]}" >> $GITHUB_OUTPUT
+          echo "mod_version=${parts[1]}" >> $GITHUB_OUTPUT
+
+      - name: Set up JDK
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: 17
+
+      - uses: actions/checkout@v4
+      - uses: actions/cache@v4
+        with:
+          path: |
+            ~/.gradle/caches
+            ~/.gradle/wrapper
+          key: ${{ runner.os }}-gradle-${{ hashFiles('**/*.gradle*', '**/gradle-wrapper.properties') }}
+          restore-keys: ubuntu-latest-gradle-
+
+      - name: Validate Gradle wrapper
+        uses: gradle/wrapper-validation-action@v2
+      - name: Grant execute permission for gradlew
+        run: chmod +x gradlew
+
+      - name: Build with Gradle
+        run: ./gradlew -PmodVersion='${{ steps.split_tag.outputs.mod_version }}' build
+
+      - name: Remove shadow JARs
+        run: |
+          rm fabric/build/libs/*-dev-shadow.jar
+          rm forge/build/libs/*-dev-shadow.jar
+          rm neoforge/build/libs/*-dev-shadow.jar
+
+      - name: Add Artifacts to Github Release
+        uses: alexellis/upload-assets@0.4.1
+        env:
+          GITHUB_TOKEN: ${{ github.token }}
+        with:
+          asset_paths: '["./fabric/build/libs/*.jar","./forge/build/libs/*.jar","./neoforge/build/libs/*.jar"]'
+
+      - uses: actions/upload-artifact@v4
+        name: Upload Artifacts
+        id: upload-artifacts
+        with:
+          name: jar-files
+          path: |
+            ./fabric/build/libs/*.jar
+            ./forge/build/libs/*.jar
+            ./neoforge/build/libs/*.jar
+          retention-days: 1
+
+  publish:
+    strategy:
+      matrix:
+        loader: [ fabric, forge, neoforge ]
+    runs-on: ubuntu-latest
+    needs: build
+
+    steps:
+      - name: Download Artifacts
+        uses: actions/download-artifact@v4
+        with:
+          name: jar-files
+
+      - name: Publish (${{ matrix.loader }})
+        uses: Kir-Antipov/mc-publish@v3.3
+        with:
+          name: ${{ github.event.repository.name }}-MC${{ needs.build.outputs.mc_version }}-${{ needs.build.outputs.mod_version }}
+          version: MC${{ needs.build.outputs.mc_version }}-${{ matrix.loader }}-${{ needs.build.outputs.mod_version }}
+          java: Java 17
+
+          files: ${{ matrix.loader }}/build/libs/*.jar
+
+          modrinth-token: ${{ secrets.MODRINTH_API_KEY }}
+          curseforge-token: ${{ secrets.CURSEFORGE_API_KEY }}
