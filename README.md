@@ -1,26 +1,35 @@
-# Scannable
-Scannable is a Minecraft mod that adds a single scanner item and a couple of scanner modules. Using the scanner will bring up a couple of overlays highlighting nearby points of interest, such as animals, monsters and ores, depending on the installed modules.
+# Scannable Reforged
 
-## License / Use in Modpacks
-This mod is [licensed under the **MIT license**](LICENSE). All **assets are public domain**, unless otherwise stated; all are free to be distributed as long as the license / source credits are kept. This means you can use this mod in any mod pack **as you please**. I'd be happy to hear about you using it, though, just out of curiosity.
+A NeoForge **1.21.1** port and fork of [Scannable](https://www.curseforge.com/minecraft/mc-mods/scannable) by Florian "Sangar" Nücke. Point a scanner at the world and have nearby ores, mobs, and other points of interest highlighted, based on the modules you install.
+
+## Credits & original project
+
+This project is a fork of **Scannable** by **Florian "Sangar" Nücke** (MightyPirates).
+
+- Original CurseForge: https://www.curseforge.com/minecraft/mc-mods/scannable
+- Original GitHub: https://github.com/MightyPirates/Scannable
+
+All credit for the original mod, its design, and the bulk of this code belongs to Sangar. This fork exists to bring Scannable to Minecraft 1.21.1 (NeoForge) and add a few changes. It is distributed under the same MIT license, with the original copyright notice retained.
+
+## What this fork changes
+
+- **Ported to Minecraft 1.21.1 / NeoForge** (the original targets up to 1.20.4).
+- **Increased the scanner's energy storage capacity** (5,000 -> 20,000 FE), so the scanner holds more charge between recharges.
+- **Added a new scanner module: Spawners** — detects mob spawners. Defaults to the vanilla `minecraft:spawner` block, which also covers mods that enhance it in place (e.g. Apotheosis). Trial-chamber blocks (`minecraft:trial_spawner`, `minecraft:vault`) or other modded spawner blocks can be added via the config.
+
+## Minecraft version / loader
+
+- Minecraft 1.21.1
+- NeoForge only (Fabric/Forge not currently provided)
+
+## License
+
+Code is licensed under the [MIT License](LICENSE), retaining the original copyright of Florian "Sangar" Nücke alongside this fork's. Assets (textures and localization), including those added in this fork, are released under CC0 1.0 Universal (public domain) unless otherwise noted.
+
+## Use in modpacks
+
+Free to use in any modpack, public or private, as long as the license and source credits are kept — same spirit as the original.
 
 ## Extending
-In general, please refer to [the API](src/main/java/li/cil/scannable/api), everything you need to know should be explained in the Javadoc of the API classes and interfaces. The scan result provider API allows registering custom scanning logic, you can provide custom scanner modules by providing a scan result provider as a capability of an item.
 
-### Gradle
-To add a dependency to Scannable for use in your mod, add the following to your `build.gradle`:
-
-```groovy
-repositories {
-    exclusiveContent {
-        forRepository { maven("https://cursemaven.com") }
-        filter { includeGroup("curse.maven") }
-    }
-}
-dependencies {
-    // Forge via ForgeGradle
-    implementation(fg.deobf("curse.maven:scannable-266784:4712704"))
-    // Fabric via Loom
-    modImplementation("curse.maven:scannable-266784:4712705")
-}
-```
+Custom scanning logic and modules are supported through the original scan result provider API; see the `api` package.
