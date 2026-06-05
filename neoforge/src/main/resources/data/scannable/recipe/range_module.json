@@ -7,10 +7,11 @@
       "item": "scannable:blank_module"
     },
     {
-      "item": "minecraft:chest"
+      "tag": "c:ender_pearls"
     }
   ],
   "result": {
-    "item": "scannable:chest_module"
+    "count": 1,
+    "id": "scannable:range_module"
   }
 }

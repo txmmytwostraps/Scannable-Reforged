@@ -7,10 +7,11 @@
       "item": "scannable:blank_module"
     },
     {
-      "tag": "forge:bones"
+      "tag": "c:bones"
     }
   ],
   "result": {
-    "item": "scannable:hostile_entity_module"
+    "count": 1,
+    "id": "scannable:hostile_entity_module"
   }
 }

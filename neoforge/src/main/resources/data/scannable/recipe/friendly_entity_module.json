@@ -7,10 +7,11 @@
       "item": "scannable:blank_module"
     },
     {
-      "item": "minecraft:water_bucket"
+      "tag": "c:leathers"
     }
   ],
   "result": {
-    "item": "scannable:fluid_module"
+    "count": 1,
+    "id": "scannable:friendly_entity_module"
   }
 }

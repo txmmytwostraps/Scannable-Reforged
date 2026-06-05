@@ -11,6 +11,7 @@
     }
   ],
   "result": {
-    "item": "scannable:entity_module"
+    "count": 1,
+    "id": "scannable:entity_module"
   }
 }

@@ -7,10 +7,11 @@
       "item": "scannable:blank_module"
     },
     {
-      "tag": "forge:ender_pearls"
+      "item": "minecraft:water_bucket"
     }
   ],
   "result": {
-    "item": "scannable:range_module"
+    "count": 1,
+    "id": "scannable:fluid_module"
   }
 }

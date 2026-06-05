@@ -7,10 +7,11 @@
       "item": "scannable:blank_module"
     },
     {
-      "tag": "forge:leather"
+      "tag": "c:gems/diamond"
     }
   ],
   "result": {
-    "item": "scannable:friendly_entity_module"
+    "count": 1,
+    "id": "scannable:rare_ores_module"
   }
 }

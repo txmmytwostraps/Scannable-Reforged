@@ -7,10 +7,11 @@
       "item": "scannable:blank_module"
     },
     {
-      "tag": "forge:gems/diamond"
+      "item": "minecraft:coal"
     }
   ],
   "result": {
-    "item": "scannable:rare_ores_module"
+    "count": 1,
+    "id": "scannable:common_ores_module"
   }
 }

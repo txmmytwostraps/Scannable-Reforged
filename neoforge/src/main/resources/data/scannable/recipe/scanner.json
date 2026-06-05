@@ -7,16 +7,16 @@
       "item": "minecraft:iron_bars"
     },
     "g": {
-      "tag": "forge:ingots/gold"
+      "tag": "c:ingots/gold"
     },
     "i": {
-      "tag": "forge:ingots/iron"
+      "tag": "c:ingots/iron"
     },
     "q": {
-      "tag": "forge:gems/quartz"
+      "tag": "c:gems/quartz"
     },
     "r": {
-      "tag": "forge:dusts/redstone"
+      "tag": "c:dusts/redstone"
     }
   },
   "pattern": [
@@ -25,6 +25,7 @@
     "gqg"
   ],
   "result": {
-    "item": "scannable:scanner"
+    "count": 1,
+    "id": "scannable:scanner"
   }
 }

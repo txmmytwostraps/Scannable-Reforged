@@ -1,0 +1,22 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "misc",
+  "group": "scanner_module",
+  "key": {
+    "b": {
+      "item": "scannable:blank_module"
+    },
+    "i": {
+      "item": "minecraft:iron_bars"
+    }
+  },
+  "pattern": [
+    "iii",
+    "ibi",
+    "iii"
+  ],
+  "result": {
+    "count": 1,
+    "id": "scannable:spawner_module"
+  }
+}

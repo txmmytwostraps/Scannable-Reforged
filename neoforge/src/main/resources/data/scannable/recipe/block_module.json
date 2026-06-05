@@ -7,10 +7,11 @@
       "item": "scannable:blank_module"
     },
     {
-      "item": "minecraft:coal"
+      "tag": "c:stones"
     }
   ],
   "result": {
-    "item": "scannable:common_ores_module"
+    "count": 1,
+    "id": "scannable:block_module"
   }
 }
