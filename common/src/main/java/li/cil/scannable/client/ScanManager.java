@@ -236,9 +236,9 @@ public final class ScanManager {
         }
     }
 
-    public static void setMatrices(final PoseStack poseStack, final Matrix4f projectionMatrix) {
+    public static void setMatrices(final Matrix4f viewMatrix, final Matrix4f projectionMatrix) {
         worldViewModelStack = new PoseStack();
-        worldViewModelStack.last().pose().set(poseStack.last().pose());
+        worldViewModelStack.last().pose().set(viewMatrix);
         worldProjectionMatrix = projectionMatrix;
     }
 
