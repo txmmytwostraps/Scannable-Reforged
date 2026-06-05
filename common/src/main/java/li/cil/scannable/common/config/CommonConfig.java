@@ -81,7 +81,7 @@ public final class CommonConfig {
 
     @Path("range") @WorldRestart @Min(0) @Max(1)
     @Comment("Relative effective range of the chest module.")
-    public static float rangeModifierModuleChest = 0.25f;
+    public static float rangeModifierModuleChest = 1.0f;
 
     @Path("range") @WorldRestart @Min(0) @Max(1)
     @Comment("Relative effective range of the spawner module.")
