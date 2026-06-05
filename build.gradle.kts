@@ -1,166 +1,65 @@
-import com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar
-import net.fabricmc.loom.api.LoomGradleExtensionAPI
-import net.fabricmc.loom.task.RemapJarTask
-
 plugins {
-    java
-    alias(libs.plugins.architectury)
-    alias(libs.plugins.loom) apply false
-    alias(libs.plugins.shadow) apply false
-    alias(libs.plugins.spotless)
+    id("net.neoforged.moddev") version "2.0.141"
 }
 
-val modId: String by project
-val modVersion: String by project
-val mavenGroup: String by project
-val enabledPlatforms: String by project
-val minecraftVersion: String = libs.versions.minecraft.get()
+val modId = "scannable"
 
-fun getGitRef(): String {
-    return providers.exec {
-        commandLine("git", "rev-parse", "--short", "HEAD")
-        isIgnoreExitValue = true
-    }.standardOutput.asText.get().trim()
+group = "li.cil.scannable"
+version = (findProperty("modVersion") as String?) ?: "0.0.0"
+base.archivesName = "ScannableReforged-MC26.1.2-neoforge"
+
+java {
+    toolchain.languageVersion = JavaLanguageVersion.of(25)
 }
 
-subprojects {
-    apply(plugin = "java")
-    apply(plugin = rootProject.libs.plugins.architectury.get().pluginId)
-    apply(plugin = rootProject.libs.plugins.loom.get().pluginId)
+repositories {
+    mavenCentral()
+}
 
-    // Dev builds (modVersion 0.0.0) get a +<gitref> suffix for traceability;
-    // released builds (-PmodVersion=x.y.z) use the clean version.
-    version = if (modVersion == "0.0.0") "${modVersion}+${getGitRef()}" else modVersion
-    group = mavenGroup
-    base.archivesName.set("ScannableReforged-MC${minecraftVersion}-${project.name}")
+neoForge {
+    version = "26.1.2.73"
 
-    architectury {
-        minecraft = minecraftVersion
-    }
-
-    configure<LoomGradleExtensionAPI> {
-        silentMojangMappingsLicense()
-    }
-
-    repositories {
-        exclusiveContent {
-            forRepository { maven("https://maven.parchmentmc.org") }
-            filter { includeGroupByRegex("org\\.parchmentmc.*") }
+    mods {
+        register(modId) {
+            sourceSet(sourceSets.main.get())
         }
     }
 
-    dependencies {
-        "minecraft"(rootProject.libs.minecraft)
-        val loom = project.extensions.getByName<LoomGradleExtensionAPI>("loom")
-        "mappings"(loom.layered {
-            officialMojangMappings()
-            parchment("org.parchmentmc.data:parchment-${rootProject.libs.versions.parchment.minecraft.get()}:${rootProject.libs.versions.parchment.mappings.get()}@zip")
-        })
-        "compileOnly"("com.google.code.findbugs:jsr305:3.0.2")
-    }
-
-    java {
-        sourceCompatibility = JavaVersion.VERSION_21
-        targetCompatibility = JavaVersion.VERSION_21
-    }
-
-    tasks {
-        jar {
-            from(rootProject.file("LICENSE")) {
-                rename { "${it}_${modId}" }
-            }
+    runs {
+        register("client") {
+            client()
         }
-
-        withType<JavaCompile>().configureEach {
-            options.encoding = "utf-8"
-            options.release.set(21)
-        }
-    }
-
-    idea {
-        module {
-            for (exclude in arrayOf("out", "logs")) {
-                excludeDirs.add(file(exclude))
-            }
+        register("data") {
+            data()
+            programArgument("--all")
+            programArguments.addAll("--mod", modId)
+            programArguments.addAll("--output", file("src/generated/resources").absolutePath)
+            programArguments.addAll("--existing", file("src/main/resources").absolutePath)
         }
     }
 }
 
-val projectConfigurations = mapOf(
-    "neoforge" to "NeoForge"
-)
+sourceSets.main.get().resources.srcDir("src/generated/resources")
 
-for (platform in enabledPlatforms.split(',')) {
-    project(":$platform") {
-        apply(plugin = rootProject.libs.plugins.shadow.get().pluginId)
+tasks.withType<JavaCompile>().configureEach {
+    options.encoding = "UTF-8"
+    options.release = 25
+}
 
-        architectury {
-            platformSetupLoomIde()
-            loader(platform)
-        }
-
-        val common: Configuration by configurations.creating
-        val shadowBundle: Configuration by configurations.creating
-
-        configurations {
-            common.isCanBeResolved = true
-            common.isCanBeConsumed = false
-
-            compileClasspath.get().extendsFrom(common)
-            runtimeClasspath.get().extendsFrom(common)
-            getByName("development${projectConfigurations[platform]}").extendsFrom(common)
-
-            shadowBundle.isCanBeResolved = true
-            shadowBundle.isCanBeConsumed = false
-        }
-
-        dependencies {
-            common(project(path = ":common", configuration = "namedElements")) { isTransitive = false }
-            shadowBundle(
-                project(
-                    path = ":common",
-                    configuration = "transformProduction${projectConfigurations[platform]}"
-                )
-            ) { isTransitive = false }
-        }
-
-        tasks {
-            withType<ShadowJar> {
-                exclude("architectury.common.json")
-                configurations = listOf(shadowBundle)
-                archiveClassifier.set("dev-shadow")
-                // Package the original MIT LICENSE into the released (remapped) jar.
-                from(rootProject.file("LICENSE")) {
-                    rename { "${it}_${modId}" }
-                }
-            }
-
-            withType<RemapJarTask> {
-                val shadowJarTask = getByName<ShadowJar>("shadowJar")
-                inputFile.set(shadowJarTask.archiveFile)
-                dependsOn(shadowJarTask)
-                archiveClassifier.set(null as String?)
-            }
-
-            jar {
-                archiveClassifier.set("dev")
-            }
-        }
-
-        (components["java"] as AdhocComponentWithVariants)
-            .withVariantsFromConfiguration(configurations["shadowRuntimeElements"]) {
-                skip()
-            }
+tasks.named<Jar>("jar") {
+    from(rootProject.file("LICENSE")) {
+        rename { "${it}_${modId}" }
     }
 }
 
-spotless {
-    java {
-        target("*/src/*/java/li/cil/**/*.java")
-
-        endWithNewline()
-        trimTrailingWhitespace()
-        removeUnusedImports()
-        indentWithSpaces()
-    }
+tasks.named<ProcessResources>("processResources") {
+    val props = mapOf(
+        "version" to version.toString(),
+        "minecraftVersion" to "26.1.2",
+        "neoforgeVersion" to "26.1.2.73",
+        "loaderVersion" to "1",
+    )
+    inputs.properties(props)
+    filesMatching("META-INF/neoforge.mods.toml") { expand(props) }
+    filteringCharset = "UTF-8"
 }
