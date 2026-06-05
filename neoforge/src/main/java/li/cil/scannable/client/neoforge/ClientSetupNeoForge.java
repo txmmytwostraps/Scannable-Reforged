@@ -7,6 +7,7 @@ import li.cil.scannable.client.gui.ConfigurableBlockScannerModuleContainerScreen
 import li.cil.scannable.client.gui.ConfigurableEntityScannerModuleContainerScreen;
 import li.cil.scannable.client.gui.ScannerContainerScreen;
 import li.cil.scannable.client.renderer.OverlayRenderer;
+import li.cil.scannable.client.renderer.ScannerRenderer;
 import li.cil.scannable.common.container.Containers;
 import net.minecraft.resources.ResourceLocation;
 import net.neoforged.api.distmarker.Dist;
@@ -53,6 +54,12 @@ public final class ClientSetupNeoForge {
 
     public static void handleRenderLevelEvent(final RenderLevelStageEvent event) {
         if (event.getStage() == RenderLevelStageEvent.Stage.AFTER_LEVEL) {
+            // Render the scan-effect wave from this stable hook (NeoForge's
+            // RenderLevelStageEvent) rather than a mid-renderLevel mixin, so the
+            // depth grab and fullscreen blit see a consistent framebuffer every
+            // frame. This is the same hook the scan results render from.
+            ScannerRenderer.render(event.getModelViewMatrix(), event.getProjectionMatrix());
+
             ScanManager.setMatrices(event.getModelViewMatrix(), event.getProjectionMatrix());
             ScanManager.renderLevel(event.getPartialTick().getGameTimeDeltaPartialTick(false));
         }
