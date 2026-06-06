@@ -4,6 +4,7 @@ import io.netty.util.collection.IntObjectHashMap;
 import io.netty.util.collection.IntObjectMap;
 import it.unimi.dsi.fastutil.ints.IntArrayList;
 import it.unimi.dsi.fastutil.ints.IntList;
+import li.cil.scannable.api.API;
 import li.cil.scannable.api.prefab.AbstractScanResultProvider;
 import li.cil.scannable.api.scanning.BlockScannerModule;
 import li.cil.scannable.api.scanning.ScanResult;
@@ -22,6 +23,7 @@ import net.minecraft.core.BlockPos;
 import net.minecraft.core.SectionPos;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.core.registries.Registries;
+import net.minecraft.network.chat.Component;
 import net.minecraft.tags.TagKey;
 import net.minecraft.util.Mth;
 import net.minecraft.world.entity.player.Player;
@@ -222,6 +224,10 @@ public final class ScanResultProviderBlock extends AbstractScanResultProvider {
 
     @Override
     public void render(final ScanResultRenderContext context, final MultiBufferSource bufferSource, final PoseStack poseStack, final Camera renderInfo, final float partialTicks, final List<ScanResult> results) {
+        if (context == ScanResultRenderContext.GUI) {
+            renderBlockIcons(bufferSource, poseStack, renderInfo, results);
+            return;
+        }
         if (context != ScanResultRenderContext.WORLD) {
             return;
         }
@@ -249,6 +255,33 @@ public final class ScanResultProviderBlock extends AbstractScanResultProvider {
                 continue;
             }
             ShapeRenderer.renderShape(poseStack, edges, br.shape, br.bounds.minX, br.bounds.minY, br.bounds.minZ, 0xFF000000 | br.color, 2.0f);
+        }
+    }
+
+    private void renderBlockIcons(final MultiBufferSource bufferSource, final PoseStack poseStack, final Camera renderInfo, final List<ScanResult> results) {
+        final org.joml.Vector3fc forward = renderInfo.forwardVector();
+        final Vec3 lookVec = new Vec3(forward.x(), forward.y(), forward.z());
+        final Vec3 viewerEyes = renderInfo.position();
+        final float yaw = renderInfo.yRot();
+        final float pitch = renderInfo.xRot();
+        final boolean showDistance = renderInfo.entity() != null && renderInfo.entity().isShiftKeyDown();
+
+        // Order results by deviation from the look vector so the one we look at draws in front.
+        results.sort(Comparator.comparing(result -> {
+            final Vec3 resultPos = result.getPosition();
+            return lookVec.dot(resultPos.subtract(viewerEyes).normalize());
+        }));
+
+        for (final ScanResult result : results) {
+            final BlockScanResult blockResult = (BlockScanResult) result;
+            final Vec3 resultPos = result.getPosition();
+            final float lookDirDot = (float) lookVec.dot(resultPos.subtract(viewerEyes).normalize());
+
+            final Component label = blockResult.block.getName();
+            if (lookDirDot > 0.98f && !label.getString().isEmpty()) {
+                final float distance = showDistance ? (float) resultPos.subtract(viewerEyes).length() : 0f;
+                renderIconLabel(bufferSource, poseStack, yaw, pitch, lookVec, viewerEyes, distance, resultPos, API.ICON_INFO, label);
+            }
         }
     }
 

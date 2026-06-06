@@ -95,9 +95,32 @@ public final class ScanResultProviderEntity extends AbstractScanResultProvider {
 
     @Override
     public void render(final ScanResultRenderContext context, final MultiBufferSource bufferSource, final PoseStack poseStack, final Camera renderInfo, final float partialTicks, final List<ScanResult> results) {
-        // TODO(Phase 3b): rebuild GUI entity-label rendering once renderIconLabel is restored. The
-        // old path read Camera.getYRot/getXRot/getLookVector/getPosition (changed in 26.1) and drew
-        // via the removed RenderType path. Stubbed for the launchable build.
+        if (context != ScanResultRenderContext.GUI) {
+            return;
+        }
+
+        final org.joml.Vector3fc forward = renderInfo.forwardVector();
+        final Vec3 lookVec = new Vec3(forward.x(), forward.y(), forward.z());
+        final Vec3 viewerEyes = renderInfo.position();
+        final float yaw = renderInfo.yRot();
+        final float pitch = renderInfo.xRot();
+        final boolean showDistance = renderInfo.entity() != null && renderInfo.entity().isShiftKeyDown();
+
+        // Order results by deviation from the look vector so the one we look at draws in front.
+        results.sort(Comparator.comparing(result -> {
+            final ScanResultEntity resultEntity = (ScanResultEntity) result;
+            final Vec3 entityEyes = resultEntity.entity.getEyePosition(partialTicks);
+            return lookVec.dot(entityEyes.subtract(viewerEyes).normalize());
+        }));
+
+        for (final ScanResult result : results) {
+            final ScanResultEntity resultEntity = (ScanResultEntity) result;
+            final Component name = resultEntity.entity.getName();
+            final Identifier icon = resultEntity.getIcon();
+            final Vec3 resultPos = resultEntity.entity.getEyePosition(partialTicks);
+            final float distance = showDistance ? (float) resultPos.subtract(viewerEyes).length() : 0f;
+            renderIconLabel(bufferSource, poseStack, yaw, pitch, lookVec, viewerEyes, distance, resultPos, icon, name);
+        }
     }
 
     @Override

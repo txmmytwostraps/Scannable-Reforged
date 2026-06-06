@@ -248,8 +248,14 @@ public final class ScanManager {
             poseStack.translate(-cam.x, -cam.y, -cam.z);
 
             final MultiBufferSource.BufferSource bufferSource = MultiBufferSource.immediate(RENDER_BUFFER);
+            // World pass: result boxes / cluster contours.
             for (final Map.Entry<ScanResultProvider, List<ScanResult>> entry : renderingResults.entrySet()) {
                 entry.getKey().render(ScanResultRenderContext.WORLD, bufferSource, poseStack, camera, partialTick, entry.getValue());
+            }
+            // Label pass: billboarded name labels shown for whatever the player looks at. The pose is
+            // camera-relative (see translate above), which is what renderIconLabel expects.
+            for (final Map.Entry<ScanResultProvider, List<ScanResult>> entry : renderingResults.entrySet()) {
+                entry.getKey().render(ScanResultRenderContext.GUI, bufferSource, poseStack, camera, partialTick, entry.getValue());
             }
             bufferSource.endBatch();
 
