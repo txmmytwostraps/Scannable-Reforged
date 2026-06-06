@@ -30,8 +30,11 @@ import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.BlockGetter;
 import net.minecraft.world.level.ChunkPos;
+import net.minecraft.world.entity.Entity;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.Block;
+import net.minecraft.world.level.block.SpawnerBlock;
+import net.minecraft.world.level.block.entity.SpawnerBlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.chunk.ChunkAccess;
 import net.minecraft.world.level.chunk.status.ChunkStatus;
@@ -279,7 +282,7 @@ public final class ScanResultProviderBlock extends AbstractScanResultProvider {
             final Vec3 resultPos = result.getPosition();
             final float lookDirDot = (float) lookVec.dot(resultPos.subtract(viewerEyes).normalize());
 
-            final Component label = blockResult.block.getName();
+            final Component label = blockResult.label != null ? blockResult.label : blockResult.block.getName();
             if (lookDirDot > 0.98f && !label.getString().isEmpty()) {
                 final float distance = showDistance ? (float) resultPos.subtract(viewerEyes).length() : 0f;
                 renderIconLabel(bufferSource, poseStack, yaw, pitch, lookVec, viewerEyes, distance, resultPos, API.ICON_INFO, label);
@@ -380,6 +383,8 @@ public final class ScanResultProviderBlock extends AbstractScanResultProvider {
         private final Set<BlockPos> blocks;
         private int color;
         @Nullable private VoxelShape shape;
+        // Overrides the generic block name in the looking-at label (e.g. "Zombie Spawner").
+        @Nullable private Component label;
 
         BlockScanResult(final Block block, final BlockPos pos) {
             this.block = block;
@@ -420,6 +425,22 @@ public final class ScanResultProviderBlock extends AbstractScanResultProvider {
 
             if (color == 0) { // E.g. glass.
                 color = DEFAULT_COLOR;
+            }
+
+            // Spawners: label with the mob they spawn ("Zombie Spawner") instead of the generic block
+            // name. Only spawner blocks pay this cost (one already-synced, cached display entity per
+            // result); vanilla SpawnerBlockEntity also covers in-place enhancers like Apotheosis. An
+            // empty/un-set spawner leaves the label null and keeps the generic "Monster Spawner".
+            if (block instanceof SpawnerBlock && level instanceof final Level realLevel) {
+                for (final BlockPos pos : blocks) {
+                    if (realLevel.getBlockEntity(pos) instanceof final SpawnerBlockEntity spawner) {
+                        final Entity display = spawner.getSpawner().getOrCreateDisplayEntity(realLevel, pos);
+                        if (display != null) {
+                            label = Component.translatable("gui.scannable.overlay.spawner", display.getType().getDescription());
+                        }
+                        break;
+                    }
+                }
             }
 
             // Build the edge-outline shape relative to the bounds min (keeps VoxelShape coords

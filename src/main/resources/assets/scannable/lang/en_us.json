@@ -38,6 +38,7 @@
   "gui.scannable.block_module.list": "Blocks",
   "gui.scannable.entity_module.list": "Entities",
   "gui.scannable.overlay.distance": "%s (%sm)",
+  "gui.scannable.overlay.spawner": "%s Spawner",
 
   "message.scannable.no_scan_modules": "No scanning module installed.",
   "message.scannable.not_enough_energy": "Not enough energy.",
