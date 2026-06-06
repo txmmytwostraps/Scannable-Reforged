@@ -42,6 +42,7 @@ public final class ModItemModelProvider extends ModelProvider {
         module(itemModels, Items.FLUID_MODULE.get());
         module(itemModels, Items.CHEST_MODULE.get());
         module(itemModels, Items.SPAWNER_MODULE.get());
+        module(itemModels, Items.LOOTR_MODULE.get());
     }
 
     private static void module(final ItemModelGenerators itemModels, final Item item) {

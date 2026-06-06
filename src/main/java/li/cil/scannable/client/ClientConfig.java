@@ -45,6 +45,11 @@ public final class ClientConfig {
         c.put(FluidTags.LAVA.location(), MapColor.TERRACOTTA_ORANGE.col);
     });
 
+    @Comment("""
+        Hide the highlight of a scanned block once it has been broken or replaced, without needing to
+        rescan (updates live as you mine). Purely visual.""")
+    public static boolean hideBrokenBlocks = true;
+
     @SuppressWarnings("unused") // Referenced in annotations.
     public static String toHexString(final Object value) {
         return "0x" + Integer.toHexString((int) value);

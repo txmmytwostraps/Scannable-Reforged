@@ -14,6 +14,7 @@ import net.minecraft.world.item.Item;
 import net.minecraft.world.item.Items;
 import net.minecraft.world.level.levelgen.structure.BuiltinStructures;
 import net.neoforged.neoforge.common.Tags;
+import net.neoforged.neoforge.common.conditions.ModLoadedCondition;
 
 import java.util.concurrent.CompletableFuture;
 
@@ -70,6 +71,16 @@ public final class ModRecipeProvider extends RecipeProvider {
             .group("scanner_module")
             .unlockedBy("has_blank_module", InventoryChangeTrigger.TriggerInstance.hasItems(BLANK_MODULE.get()))
             .save(output);
+
+        // Lootr module: chest module + gold ingot. Gated behind a mod_loaded("lootr") condition so the
+        // recipe only exists when Lootr is in the pack (the module is otherwise inert and uncraftable).
+        final RecipeOutput lootrOutput = output.withConditions(new ModLoadedCondition("lootr"));
+        shapeless(RecipeCategory.MISC, LOOTR_MODULE.get())
+            .requires(CHEST_MODULE.get())
+            .requires(Tags.Items.INGOTS_GOLD)
+            .group("scanner_module")
+            .unlockedBy("has_chest_module", InventoryChangeTrigger.TriggerInstance.hasItems(CHEST_MODULE.get()))
+            .save(lootrOutput);
     }
 
     private void module(final Item item, final TagKey<Item> ingredient) {

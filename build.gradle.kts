@@ -22,6 +22,17 @@ dependencies {
     // JEI is loaded only in the dev runs (not a compile dependency, not bundled in the jar). Lets us
     // verify the 26.1 module recipes show up correctly in-game.
     runtimeOnly("mezz.jei:jei-26.1.2-neoforge:29.6.2.31")
+
+    // Lootr — OPTIONAL integration (the Lootr scanner module). Lootr's 26.1.2 build is published to
+    // CurseForge only (not the BlameJared maven), so it's referenced as a local jar. compileOnly keeps
+    // it a true soft dependency: not bundled in our jar and not required at runtime. When Lootr is
+    // absent the Lootr module is inert (its `lootr:containers` tag is empty) and none of Lootr's
+    // classes are ever loaded (every reference is gated behind a ModList check).
+    compileOnly(files("libs/lootr-neoforge-26.1.2-1.22.36.109.jar"))
+    // ...and load it in the dev runs (like JEI above) so the integration actually activates in-dev for
+    // testing. runtimeOnly is NOT bundled into the release jar. Comment this out to test the no-Lootr
+    // path (inert module + red "Lootr mod required" tooltip + hidden recipe).
+    runtimeOnly(files("libs/lootr-neoforge-26.1.2-1.22.36.109.jar"))
 }
 
 neoForge {

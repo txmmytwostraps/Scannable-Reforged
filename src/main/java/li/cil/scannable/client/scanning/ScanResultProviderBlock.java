@@ -11,6 +11,7 @@ import li.cil.scannable.api.scanning.ScanResult;
 import li.cil.scannable.api.scanning.ScanResultRenderContext;
 import li.cil.scannable.api.scanning.ScannerModule;
 import li.cil.scannable.client.ClientConfig;
+import li.cil.scannable.common.integration.lootr.LootrIntegration;
 import li.cil.scannable.common.item.ScannerModuleItem;
 import li.cil.scannable.common.scanning.ConfigurableSpawnerScannerModule;
 import li.cil.scannable.common.scanning.filter.IgnoredBlocks;
@@ -18,6 +19,7 @@ import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.blaze3d.vertex.VertexConsumer;
 import li.cil.scannable.client.renderer.ScanResultRenderType;
 import net.minecraft.client.Camera;
+import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.MultiBufferSource;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.SectionPos;
@@ -269,11 +271,75 @@ public final class ScanResultProviderBlock extends AbstractScanResultProvider {
             final int c = br.color;
             final float r = ((c >> 16) & 0xFF) / 255.0f, g = ((c >> 8) & 0xFF) / 255.0f, b = (c & 0xFF) / 255.0f;
             if (br.blocks.size() <= MAX_CONTOUR_CELLS) {
-                addClusterFill(fill, pose, br.blocks, br.bounds, r, g, b, 1.0f);
+                // Hide-broken-blocks: contour only the cells that are still the scanned block in the
+                // world, so a cluster's highlight shrinks live as you mine it (no rescan needed). A
+                // fully-mined cluster drops out entirely.
+                final Set<BlockPos> cells = visibleCells(br);
+                if (cells.isEmpty()) {
+                    continue;
+                }
+                addClusterFill(fill, pose, cells, br.bounds, r, g, b, 1.0f);
             } else {
                 addBox(fill, pose, br.bounds, r, g, b, 1.0f);
             }
         }
+    }
+
+    // The cells of a cluster still present (and, for Lootr containers, not yet looted) in the world.
+    // When neither check applies (or there's no client level), this is the full cell set. Cells in
+    // unloaded chunks are treated as present so we don't wrongly clear a highlight the player just
+    // walked away from.
+    private static Set<BlockPos> visibleCells(final BlockScanResult br) {
+        final boolean checkBroken = ClientConfig.hideBrokenBlocks;
+        if (!br.lootr && !checkBroken) {
+            return br.blocks;
+        }
+        final Level level = Minecraft.getInstance().level;
+        if (level == null) {
+            return br.blocks;
+        }
+        final Player player = Minecraft.getInstance().player;
+        final Set<BlockPos> visible = new HashSet<>();
+        for (final BlockPos cell : br.blocks) {
+            if (cellPresent(level, player, br, cell, checkBroken)) {
+                visible.add(cell);
+            }
+        }
+        return visible;
+    }
+
+    // Cheap short-circuit form of visibleCells for the label pass: does the cluster still have any
+    // visible cell? Avoids allocating a set just to test emptiness.
+    private static boolean hasVisibleCells(final BlockScanResult br) {
+        final boolean checkBroken = ClientConfig.hideBrokenBlocks;
+        if (!br.lootr && !checkBroken) {
+            return true;
+        }
+        final Level level = Minecraft.getInstance().level;
+        if (level == null) {
+            return true;
+        }
+        final Player player = Minecraft.getInstance().player;
+        for (final BlockPos cell : br.blocks) {
+            if (cellPresent(level, player, br, cell, checkBroken)) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    private static boolean cellPresent(final Level level, @Nullable final Player player, final BlockScanResult br, final BlockPos cell, final boolean checkBroken) {
+        if (!level.hasChunkAt(cell)) {
+            return true; // Unloaded -> unknown, assume present.
+        }
+        if (br.lootr) {
+            // Lootr results manage their own presence regardless of the hide-broken-blocks toggle: a
+            // container drops out once it's been removed, OR once this player has looted it (live,
+            // exactly like Lootr's own per-player "already looted" rendering).
+            return LootrIntegration.isContainer(level.getBlockState(cell))
+                && !LootrIntegration.isClientLooted(level, cell, player);
+        }
+        return !checkBroken || level.getBlockState(cell).is(br.block);
     }
 
     private void renderBlockIcons(final MultiBufferSource bufferSource, final PoseStack poseStack, final Camera renderInfo, final List<ScanResult> results) {
@@ -292,6 +358,12 @@ public final class ScanResultProviderBlock extends AbstractScanResultProvider {
 
         for (final ScanResult result : results) {
             final BlockScanResult blockResult = (BlockScanResult) result;
+
+            // Don't label a cluster whose blocks have all been mined since the last scan.
+            if (!hasVisibleCells(blockResult)) {
+                continue;
+            }
+
             final Vec3 resultPos = result.getPosition();
             final float lookDirDot = (float) lookVec.dot(resultPos.subtract(viewerEyes).normalize());
 
@@ -433,6 +505,8 @@ public final class ScanResultProviderBlock extends AbstractScanResultProvider {
         // The mob this result's spawner spawns (null for non-spawners / empty spawners); drives the
         // spawner mob filter.
         @Nullable private EntityType<?> spawnerType;
+        // This result is a Lootr loot container: highlight gold and hide live once looted.
+        private boolean lootr;
 
         BlockScanResult(final Block block, final BlockPos pos) {
             this.block = block;
@@ -492,6 +566,14 @@ public final class ScanResultProviderBlock extends AbstractScanResultProvider {
                 }
             }
 
+            // Lootr loot containers: force the gold highlight + flag them for the live looted-hide.
+            // No custom label, so the looking-at name falls back to the block's own native name
+            // ("Loot Chest", "Loot Barrel", ...). Detection is tag-only (no Lootr classes), so this is
+            // a no-op without Lootr installed.
+            if (LootrIntegration.isContainer(blockState)) {
+                lootr = true;
+                color = LootrIntegration.GOLD;
+            }
         }
 
         boolean isRoot() {

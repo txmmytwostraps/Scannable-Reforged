@@ -24,6 +24,7 @@ public final class ProviderCacheManager {
         RareOresBlockScannerModule.clearCache();
         ChestScannerModule.clearCache();
         ConfigurableSpawnerScannerModule.clearCache();
+        LootrBlockScannerModule.clearCache();
         IgnoredBlocks.clearCache();
     }
 }
