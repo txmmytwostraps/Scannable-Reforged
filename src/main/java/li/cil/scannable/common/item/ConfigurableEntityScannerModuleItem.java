@@ -46,7 +46,7 @@ public final class ConfigurableEntityScannerModuleItem extends ScannerModuleItem
         return result;
     }
 
-    private static boolean addEntityType(final ItemStack stack, final EntityType<?> entityType) {
+    public static boolean addEntityType(final ItemStack stack, final EntityType<?> entityType) {
         final Optional<ResourceKey<EntityType<?>>> registryName = BuiltInRegistries.ENTITY_TYPE.getResourceKey(entityType);
         if (registryName.isEmpty()) {
             return false;

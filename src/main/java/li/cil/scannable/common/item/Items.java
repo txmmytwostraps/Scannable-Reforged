@@ -26,7 +26,7 @@ public final class Items {
     public static final DeferredHolder<Item, ? extends Item> RARE_ORES_MODULE = ITEMS.registerItem("rare_ores_module", properties -> new ScannerModuleItem(RareOresBlockScannerModule.INSTANCE, properties));
     public static final DeferredHolder<Item, ? extends Item> FLUID_MODULE = ITEMS.registerItem("fluid_module", properties -> new ScannerModuleItem(FluidBlockScannerModule.INSTANCE, properties));
     public static final DeferredHolder<Item, ? extends Item> CHEST_MODULE = ITEMS.registerItem("chest_module", properties -> new ScannerModuleItem(ChestScannerModule.INSTANCE, properties));
-    public static final DeferredHolder<Item, ? extends Item> SPAWNER_MODULE = ITEMS.registerItem("spawner_module", properties -> new ScannerModuleItem(SpawnerBlockScannerModule.INSTANCE, properties));
+    public static final DeferredHolder<Item, ? extends Item> SPAWNER_MODULE = ITEMS.registerItem("spawner_module", ConfigurableSpawnerScannerModuleItem::new);
 
     // --------------------------------------------------------------------- //
 

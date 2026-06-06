@@ -12,6 +12,7 @@ import li.cil.scannable.api.scanning.ScanResultRenderContext;
 import li.cil.scannable.api.scanning.ScannerModule;
 import li.cil.scannable.client.ClientConfig;
 import li.cil.scannable.common.item.ScannerModuleItem;
+import li.cil.scannable.common.scanning.ConfigurableSpawnerScannerModule;
 import li.cil.scannable.common.scanning.filter.IgnoredBlocks;
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.blaze3d.vertex.VertexConsumer;
@@ -31,6 +32,7 @@ import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.BlockGetter;
 import net.minecraft.world.level.ChunkPos;
 import net.minecraft.world.entity.Entity;
+import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.SpawnerBlock;
@@ -67,6 +69,11 @@ public final class ScanResultProviderBlock extends AbstractScanResultProvider {
     private final Map<Block, Map<BlockPos, BlockScanResult>> resultClusters = new HashMap<>();
     private final List<BlockScanResult> results = new ArrayList<>();
 
+    // Spawner mob narrowing, gathered from spawner modules. matchAll = an unconfigured spawner module
+    // is present (highlight every spawner); otherwise only spawners whose mob is in mobFilter pass.
+    private boolean spawnerMatchAll;
+    private final Set<EntityType<?>> spawnerMobFilter = new HashSet<>();
+
     // --------------------------------------------------------------------- //
     // ScanResultProvider
 
@@ -75,6 +82,8 @@ public final class ScanResultProviderBlock extends AbstractScanResultProvider {
         super.initialize(player, modules, center, radius, scanTicks);
 
         scanFilterLayers.clear();
+        spawnerMatchAll = false;
+        spawnerMobFilter.clear();
 
         final IntObjectMap<List<Predicate<BlockState>>> filterByRadius = new IntObjectHashMap<>();
         for (final ItemStack stack : modules) {
@@ -84,6 +93,14 @@ public final class ScanResultProviderBlock extends AbstractScanResultProvider {
                     final Predicate<BlockState> filter = blockModule.getFilter(stack);
                     final int localRadius = (int) Math.ceil(blockModule.adjustLocalRange(this.radius));
                     filterByRadius.computeIfAbsent(localRadius, r -> new ArrayList<>()).add(filter);
+                }
+                if (module instanceof final ConfigurableSpawnerScannerModule spawnerModule) {
+                    final List<EntityType<?>> types = spawnerModule.getEntityTypes(stack);
+                    if (types.isEmpty()) {
+                        spawnerMatchAll = true; // unconfigured -> all spawners
+                    } else {
+                        spawnerMobFilter.addAll(types);
+                    }
                 }
             });
         }
@@ -220,6 +237,14 @@ public final class ScanResultProviderBlock extends AbstractScanResultProvider {
         for (final BlockScanResult result : results) {
             if (result.isRoot()) {
                 result.bake(level);
+
+                // Spawner mob narrowing: when a mob filter is active, drop spawners that don't spawn a
+                // configured mob (including empty spawners). Non-spawner results are unaffected.
+                if (result.block instanceof SpawnerBlock && !spawnerMatchAll && !spawnerMobFilter.isEmpty()
+                    && (result.spawnerType == null || !spawnerMobFilter.contains(result.spawnerType))) {
+                    continue;
+                }
+
                 callback.accept(result);
             }
         }
@@ -385,6 +410,9 @@ public final class ScanResultProviderBlock extends AbstractScanResultProvider {
         @Nullable private VoxelShape shape;
         // Overrides the generic block name in the looking-at label (e.g. "Zombie Spawner").
         @Nullable private Component label;
+        // The mob this result's spawner spawns (null for non-spawners / empty spawners); drives the
+        // spawner mob filter.
+        @Nullable private EntityType<?> spawnerType;
 
         BlockScanResult(final Block block, final BlockPos pos) {
             this.block = block;
@@ -436,6 +464,7 @@ public final class ScanResultProviderBlock extends AbstractScanResultProvider {
                     if (realLevel.getBlockEntity(pos) instanceof final SpawnerBlockEntity spawner) {
                         final Entity display = spawner.getSpawner().getOrCreateDisplayEntity(realLevel, pos);
                         if (display != null) {
+                            spawnerType = display.getType();
                             label = Component.translatable("gui.scannable.overlay.spawner", display.getType().getDescription());
                         }
                         break;
