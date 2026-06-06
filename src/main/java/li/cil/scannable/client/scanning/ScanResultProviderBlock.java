@@ -19,7 +19,6 @@ import com.mojang.blaze3d.vertex.VertexConsumer;
 import li.cil.scannable.client.renderer.ScanResultRenderType;
 import net.minecraft.client.Camera;
 import net.minecraft.client.renderer.MultiBufferSource;
-import net.minecraft.client.renderer.ShapeRenderer;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.SectionPos;
 import net.minecraft.core.registries.BuiltInRegistries;
@@ -45,8 +44,6 @@ import net.minecraft.world.level.chunk.PalettedContainer;
 import net.minecraft.world.level.material.FluidState;
 import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.Vec3;
-import net.minecraft.world.phys.shapes.Shapes;
-import net.minecraft.world.phys.shapes.VoxelShape;
 
 import javax.annotation.Nullable;
 import java.util.*;
@@ -262,29 +259,20 @@ public final class ScanResultProviderBlock extends AbstractScanResultProvider {
 
         final PoseStack.Pose pose = poseStack.last();
 
-        // Pass 1: animated shimmer fill (additive scanlines + pulse + edge glow), contouring the
-        // actual ore cells. Additive blend uses the colour magnitude, so pass the ore colour at full
-        // intensity and let the shader modulate it.
+        // Animated shimmer fill (additive scanlines + pulse + edge glow), contouring the actual ore
+        // cells. The shader's edge glow IS the outline; UVs span the whole cluster so the glow sits on
+        // the cluster's outer perimeter (one smooth outline) rather than around every cell. No separate
+        // wireframe pass — that's what made multi-block clusters look like a noisy grid of cubes.
         final VertexConsumer fill = bufferSource.getBuffer(ScanResultRenderType.SHIMMER_TYPE);
         for (final ScanResult result : results) {
             final BlockScanResult br = (BlockScanResult) result;
             final int c = br.color;
             final float r = ((c >> 16) & 0xFF) / 255.0f, g = ((c >> 8) & 0xFF) / 255.0f, b = (c & 0xFF) / 255.0f;
             if (br.blocks.size() <= MAX_CONTOUR_CELLS) {
-                addClusterFill(fill, pose, br.blocks, r, g, b, 1.0f);
+                addClusterFill(fill, pose, br.blocks, br.bounds, r, g, b, 1.0f);
             } else {
                 addBox(fill, pose, br.bounds, r, g, b, 1.0f);
             }
-        }
-
-        // Pass 2: bright edges outlining the cluster contour.
-        final VertexConsumer edges = bufferSource.getBuffer(ScanResultRenderType.LINES_TYPE);
-        for (final ScanResult result : results) {
-            final BlockScanResult br = (BlockScanResult) result;
-            if (br.shape == null) {
-                continue;
-            }
-            ShapeRenderer.renderShape(poseStack, edges, br.shape, br.bounds.minX, br.bounds.minY, br.bounds.minZ, 0xFF000000 | br.color, 2.0f);
         }
     }
 
@@ -318,38 +306,71 @@ public final class ScanResultProviderBlock extends AbstractScanResultProvider {
     private static void addBox(final VertexConsumer buffer, final PoseStack.Pose pose, final AABB box, final float r, final float g, final float b, final float a) {
         final float x0 = (float) box.minX, y0 = (float) box.minY, z0 = (float) box.minZ;
         final float x1 = (float) box.maxX, y1 = (float) box.maxY, z1 = (float) box.maxZ;
-        // Six quad faces (cull is off, so winding is irrelevant). POSITION_TEX_COLOR.
-        quad(buffer, pose, x0, y0, z0, x0, y0, z1, x0, y1, z1, x0, y1, z0, r, g, b, a);
-        quad(buffer, pose, x1, y0, z1, x1, y0, z0, x1, y1, z0, x1, y1, z1, r, g, b, a);
-        quad(buffer, pose, x0, y0, z0, x1, y0, z0, x1, y0, z1, x0, y0, z1, r, g, b, a);
-        quad(buffer, pose, x0, y1, z1, x1, y1, z1, x1, y1, z0, x0, y1, z0, r, g, b, a);
-        quad(buffer, pose, x1, y0, z0, x0, y0, z0, x0, y1, z0, x1, y1, z0, r, g, b, a);
-        quad(buffer, pose, x0, y0, z1, x1, y0, z1, x1, y1, z1, x0, y1, z1, r, g, b, a);
+        // Single box (huge-cluster fallback): 0..1 UV per face spans the whole box = the cluster, so
+        // the shimmer's edge glow outlines the box. Cull is off, so winding is irrelevant.
+        vertex(buffer, pose, x0, y0, z0, 0, 0, r, g, b, a); vertex(buffer, pose, x0, y0, z1, 0, 1, r, g, b, a); vertex(buffer, pose, x0, y1, z1, 1, 1, r, g, b, a); vertex(buffer, pose, x0, y1, z0, 1, 0, r, g, b, a);
+        vertex(buffer, pose, x1, y0, z1, 0, 1, r, g, b, a); vertex(buffer, pose, x1, y0, z0, 0, 0, r, g, b, a); vertex(buffer, pose, x1, y1, z0, 1, 0, r, g, b, a); vertex(buffer, pose, x1, y1, z1, 1, 1, r, g, b, a);
+        vertex(buffer, pose, x0, y0, z0, 0, 0, r, g, b, a); vertex(buffer, pose, x1, y0, z0, 1, 0, r, g, b, a); vertex(buffer, pose, x1, y0, z1, 1, 1, r, g, b, a); vertex(buffer, pose, x0, y0, z1, 0, 1, r, g, b, a);
+        vertex(buffer, pose, x0, y1, z1, 0, 1, r, g, b, a); vertex(buffer, pose, x1, y1, z1, 1, 1, r, g, b, a); vertex(buffer, pose, x1, y1, z0, 1, 0, r, g, b, a); vertex(buffer, pose, x0, y1, z0, 0, 0, r, g, b, a);
+        vertex(buffer, pose, x1, y0, z0, 1, 0, r, g, b, a); vertex(buffer, pose, x0, y0, z0, 0, 0, r, g, b, a); vertex(buffer, pose, x0, y1, z0, 0, 1, r, g, b, a); vertex(buffer, pose, x1, y1, z0, 1, 1, r, g, b, a);
+        vertex(buffer, pose, x0, y0, z1, 0, 0, r, g, b, a); vertex(buffer, pose, x1, y0, z1, 1, 0, r, g, b, a); vertex(buffer, pose, x1, y1, z1, 1, 1, r, g, b, a); vertex(buffer, pose, x0, y1, z1, 0, 1, r, g, b, a);
     }
 
-    private static void addClusterFill(final VertexConsumer buffer, final PoseStack.Pose pose, final Set<BlockPos> cells, final float r, final float g, final float b, final float a) {
+    private static void addClusterFill(final VertexConsumer buffer, final PoseStack.Pose pose, final Set<BlockPos> cells, final AABB bounds, final float r, final float g, final float b, final float a) {
+        // UVs span the whole cluster (not each cell), so the shimmer shader's edge glow lands on the
+        // cluster's outer perimeter as one smooth outline instead of around every cell face.
+        final float sx = (float) (1.0 / bounds.getXsize());
+        final float sy = (float) (1.0 / bounds.getYsize());
+        final float sz = (float) (1.0 / bounds.getZsize());
+        final float bx = (float) bounds.minX, by = (float) bounds.minY, bz = (float) bounds.minZ;
         for (final BlockPos cell : cells) {
             final float x0 = cell.getX(), y0 = cell.getY(), z0 = cell.getZ();
             final float x1 = x0 + 1.0f, y1 = y0 + 1.0f, z1 = z0 + 1.0f;
-            // Only emit faces on the outside of the cluster (neighbour cell not part of it).
-            if (!cells.contains(cell.west()))  quad(buffer, pose, x0, y0, z0, x0, y0, z1, x0, y1, z1, x0, y1, z0, r, g, b, a);
-            if (!cells.contains(cell.east()))  quad(buffer, pose, x1, y0, z1, x1, y0, z0, x1, y1, z0, x1, y1, z1, r, g, b, a);
-            if (!cells.contains(cell.below())) quad(buffer, pose, x0, y0, z0, x1, y0, z0, x1, y0, z1, x0, y0, z1, r, g, b, a);
-            if (!cells.contains(cell.above())) quad(buffer, pose, x0, y1, z1, x1, y1, z1, x1, y1, z0, x0, y1, z0, r, g, b, a);
-            if (!cells.contains(cell.north())) quad(buffer, pose, x1, y0, z0, x0, y0, z0, x0, y1, z0, x1, y1, z0, r, g, b, a);
-            if (!cells.contains(cell.south())) quad(buffer, pose, x0, y0, z1, x1, y0, z1, x1, y1, z1, x0, y1, z1, r, g, b, a);
+            final float ux0 = (x0 - bx) * sx, ux1 = (x1 - bx) * sx;
+            final float uy0 = (y0 - by) * sy, uy1 = (y1 - by) * sy;
+            final float uz0 = (z0 - bz) * sz, uz1 = (z1 - bz) * sz;
+            // Only the outer faces (neighbour cell not in the cluster). UV uses the two tangent axes.
+            if (!cells.contains(cell.west())) {
+                vertex(buffer, pose, x0, y0, z0, uy0, uz0, r, g, b, a);
+                vertex(buffer, pose, x0, y0, z1, uy0, uz1, r, g, b, a);
+                vertex(buffer, pose, x0, y1, z1, uy1, uz1, r, g, b, a);
+                vertex(buffer, pose, x0, y1, z0, uy1, uz0, r, g, b, a);
+            }
+            if (!cells.contains(cell.east())) {
+                vertex(buffer, pose, x1, y0, z1, uy0, uz1, r, g, b, a);
+                vertex(buffer, pose, x1, y0, z0, uy0, uz0, r, g, b, a);
+                vertex(buffer, pose, x1, y1, z0, uy1, uz0, r, g, b, a);
+                vertex(buffer, pose, x1, y1, z1, uy1, uz1, r, g, b, a);
+            }
+            if (!cells.contains(cell.below())) {
+                vertex(buffer, pose, x0, y0, z0, ux0, uz0, r, g, b, a);
+                vertex(buffer, pose, x1, y0, z0, ux1, uz0, r, g, b, a);
+                vertex(buffer, pose, x1, y0, z1, ux1, uz1, r, g, b, a);
+                vertex(buffer, pose, x0, y0, z1, ux0, uz1, r, g, b, a);
+            }
+            if (!cells.contains(cell.above())) {
+                vertex(buffer, pose, x0, y1, z1, ux0, uz1, r, g, b, a);
+                vertex(buffer, pose, x1, y1, z1, ux1, uz1, r, g, b, a);
+                vertex(buffer, pose, x1, y1, z0, ux1, uz0, r, g, b, a);
+                vertex(buffer, pose, x0, y1, z0, ux0, uz0, r, g, b, a);
+            }
+            if (!cells.contains(cell.north())) {
+                vertex(buffer, pose, x1, y0, z0, ux1, uy0, r, g, b, a);
+                vertex(buffer, pose, x0, y0, z0, ux0, uy0, r, g, b, a);
+                vertex(buffer, pose, x0, y1, z0, ux0, uy1, r, g, b, a);
+                vertex(buffer, pose, x1, y1, z0, ux1, uy1, r, g, b, a);
+            }
+            if (!cells.contains(cell.south())) {
+                vertex(buffer, pose, x0, y0, z1, ux0, uy0, r, g, b, a);
+                vertex(buffer, pose, x1, y0, z1, ux1, uy0, r, g, b, a);
+                vertex(buffer, pose, x1, y1, z1, ux1, uy1, r, g, b, a);
+                vertex(buffer, pose, x0, y1, z1, ux0, uy1, r, g, b, a);
+            }
         }
     }
 
-    private static void quad(final VertexConsumer buffer, final PoseStack.Pose pose,
-                             final float ax, final float ay, final float az, final float bx, final float by, final float bz,
-                             final float cx, final float cy, final float cz, final float dx, final float dy, final float dz,
-                             final float r, final float g, final float b, final float a) {
-        // POSITION_TEX_COLOR with a full 0..1 UV per face so the shimmer's edge glow tracks the face border.
-        buffer.addVertex(pose, ax, ay, az).setUv(0, 1).setColor(r, g, b, a);
-        buffer.addVertex(pose, bx, by, bz).setUv(1, 1).setColor(r, g, b, a);
-        buffer.addVertex(pose, cx, cy, cz).setUv(1, 0).setColor(r, g, b, a);
-        buffer.addVertex(pose, dx, dy, dz).setUv(0, 0).setColor(r, g, b, a);
+    private static void vertex(final VertexConsumer buffer, final PoseStack.Pose pose, final float x, final float y, final float z, final float u, final float v, final float r, final float g, final float b, final float a) {
+        buffer.addVertex(pose, x, y, z).setUv(u, v).setColor(r, g, b, a);
     }
 
     @Override
@@ -407,7 +428,6 @@ public final class ScanResultProviderBlock extends AbstractScanResultProvider {
         @Nullable private BlockScanResult parent;
         private final Set<BlockPos> blocks;
         private int color;
-        @Nullable private VoxelShape shape;
         // Overrides the generic block name in the looking-at label (e.g. "Zombie Spawner").
         @Nullable private Component label;
         // The mob this result's spawner spawns (null for non-spawners / empty spawners); drives the
@@ -472,22 +492,6 @@ public final class ScanResultProviderBlock extends AbstractScanResultProvider {
                 }
             }
 
-            // Build the edge-outline shape relative to the bounds min (keeps VoxelShape coords
-            // small). Small clusters contour the real cells; huge ones fall back to the bounding box.
-            final int ox = (int) Math.floor(bounds.minX);
-            final int oy = (int) Math.floor(bounds.minY);
-            final int oz = (int) Math.floor(bounds.minZ);
-            if (blocks.size() <= MAX_CONTOUR_CELLS) {
-                VoxelShape s = Shapes.empty();
-                for (final BlockPos cell : blocks) {
-                    s = Shapes.or(s, Shapes.box(
-                        cell.getX() - ox, cell.getY() - oy, cell.getZ() - oz,
-                        cell.getX() - ox + 1, cell.getY() - oy + 1, cell.getZ() - oz + 1));
-                }
-                shape = s;
-            } else {
-                shape = Shapes.create(bounds.move(-ox, -oy, -oz));
-            }
         }
 
         boolean isRoot() {
