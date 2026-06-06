@@ -1,14 +1,10 @@
-{
+﻿{
   "type": "minecraft:crafting_shaped",
   "category": "misc",
   "group": "scanner_module",
   "key": {
-    "b": {
-      "item": "scannable:blank_module"
-    },
-    "i": {
-      "item": "minecraft:iron_bars"
-    }
+    "b": "scannable:blank_module",
+    "i": "minecraft:iron_bars"
   },
   "pattern": [
     "iii",
