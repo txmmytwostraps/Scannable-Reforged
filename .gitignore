@@ -50,9 +50,7 @@ logs/
 
 # Local scratch / build logs (not part of the mod)
 orig-*.txt
-compile-out.txt
-runclient-out.txt
-deps-out.txt
+*-out.txt
 *-src.txt
 src-*.txt
 jb.txt

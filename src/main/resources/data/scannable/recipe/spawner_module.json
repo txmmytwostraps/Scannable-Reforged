@@ -1,4 +1,4 @@
-﻿{
+{
   "type": "minecraft:crafting_shaped",
   "category": "misc",
   "group": "scanner_module",
@@ -12,7 +12,6 @@
     "iii"
   ],
   "result": {
-    "count": 1,
     "id": "scannable:spawner_module"
   }
 }

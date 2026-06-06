@@ -1,4 +1,4 @@
-﻿{
+{
   "type": "minecraft:crafting_shaped",
   "category": "equipment",
   "group": "scanner",
@@ -15,7 +15,6 @@
     "gqg"
   ],
   "result": {
-    "count": 1,
     "id": "scannable:scanner"
   }
 }

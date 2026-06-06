@@ -1,4 +1,4 @@
-﻿{
+{
   "type": "minecraft:crafting_shaped",
   "category": "misc",
   "group": "blank_module",
@@ -14,7 +14,6 @@
     "cnc"
   ],
   "result": {
-    "count": 1,
     "id": "scannable:blank_module"
   }
 }

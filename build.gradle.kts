@@ -37,9 +37,16 @@ neoForge {
         register("client") {
             client()
         }
-        register("data") {
-            data()
-            programArgument("--all")
+        // 26.1 splits datagen into client (resource pack: item models) and server (data pack:
+        // recipes, tags) runs, matching GatherDataEvent.Client / .Server.
+        register("clientData") {
+            clientData()
+            programArguments.addAll("--mod", modId)
+            programArguments.addAll("--output", file("src/generated/resources").absolutePath)
+            programArguments.addAll("--existing", file("src/main/resources").absolutePath)
+        }
+        register("serverData") {
+            serverData()
             programArguments.addAll("--mod", modId)
             programArguments.addAll("--output", file("src/generated/resources").absolutePath)
             programArguments.addAll("--existing", file("src/main/resources").absolutePath)
@@ -48,10 +55,6 @@ neoForge {
 }
 
 sourceSets.main.get().resources.srcDir("src/generated/resources")
-
-// The datagen providers target the 1.21.1 datagen API; excluded from compilation pending
-// the 26.1 datagen-API migration. Generated resources (src/generated) are already committed.
-sourceSets.main.get().java.exclude("li/cil/scannable/data/**")
 
 tasks.withType<JavaCompile>().configureEach {
     options.encoding = "UTF-8"

@@ -1,23 +1,23 @@
 package li.cil.scannable.data.neoforge;
 
+import li.cil.scannable.api.API;
 import net.neoforged.bus.api.SubscribeEvent;
 import net.neoforged.fml.common.EventBusSubscriber;
 import net.neoforged.neoforge.data.event.GatherDataEvent;
 
-@EventBusSubscriber(bus = EventBusSubscriber.Bus.MOD)
+@EventBusSubscriber(modid = API.MOD_ID)
 public final class DataGenerators {
+    // 26.1 split datagen into a Server event (data pack: recipes, tags) and a Client event
+    // (resource pack: item models). Providers are built from the event's pack output / lookup.
     @SubscribeEvent
-    public static void gatherData(final GatherDataEvent event) {
-        final var generator = event.getGenerator();
-        final var output = generator.getPackOutput();
-        final var lookupProvider = event.getLookupProvider();
-        final var existingFileHelper = event.getExistingFileHelper();
+    public static void gatherServerData(final GatherDataEvent.Server event) {
+        event.createProvider(ModRecipeProvider.Runner::new);
+        event.createProvider(ModBlockTagsProvider::new);
+        event.createProvider(ModItemTagsProvider::new);
+    }
 
-        final var blockTagsProvider = new ModBlockTagsProvider(output, lookupProvider, existingFileHelper);
-        generator.addProvider(event.includeServer(), blockTagsProvider);
-        generator.addProvider(event.includeServer(), new ModItemTagsProvider(output, lookupProvider, blockTagsProvider.contentsGetter(), existingFileHelper));
-        generator.addProvider(event.includeServer(), new ModRecipeProvider(output, lookupProvider));
-
-        generator.addProvider(event.includeClient(), new ModItemModelProvider(output, existingFileHelper));
+    @SubscribeEvent
+    public static void gatherClientData(final GatherDataEvent.Client event) {
+        event.createProvider(ModItemModelProvider::new);
     }
 }

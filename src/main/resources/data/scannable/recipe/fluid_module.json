@@ -1,4 +1,4 @@
-﻿{
+{
   "type": "minecraft:crafting_shapeless",
   "category": "misc",
   "group": "scanner_module",
@@ -7,7 +7,6 @@
     "minecraft:water_bucket"
   ],
   "result": {
-    "count": 1,
     "id": "scannable:fluid_module"
   }
 }
