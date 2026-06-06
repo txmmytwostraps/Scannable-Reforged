@@ -56,7 +56,7 @@ public final class ConfigurableEntityScannerModuleItem extends ScannerModuleItem
             return false;
         }
 
-        final Identifier id = registryName.get().location();
+        final Identifier id = registryName.get().identifier();
 
         final List<Identifier> list = new ArrayList<>(stack.getOrDefault(ModDataComponents.ENTITY_TYPES.get(), Collections.emptyList()));
         if (list.contains(id)) {
@@ -85,7 +85,7 @@ public final class ConfigurableEntityScannerModuleItem extends ScannerModuleItem
             return;
         }
 
-        final Identifier id = registryName.get().location();
+        final Identifier id = registryName.get().identifier();
 
         final List<Identifier> list = new ArrayList<>(stack.getOrDefault(ModDataComponents.ENTITY_TYPES.get(), Collections.emptyList()));
         final int oldIndex = list.indexOf(id);

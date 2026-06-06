@@ -1,35 +1,15 @@
 package li.cil.scannable.common.energy;
 
 import net.minecraft.world.item.ItemStack;
-import net.neoforged.neoforge.capabilities.Capabilities;
 
 import java.util.Optional;
 
 public interface ItemEnergyStorage {
     static Optional<ItemEnergyStorage> of(final ItemStack stack) {
-        return Optional.ofNullable(stack.getCapability(Capabilities.EnergyStorage.ITEM)).map(capability -> new ItemEnergyStorage() {
-            @Override
-            public long receiveEnergy(final long amount, final boolean simulate) {
-                final int clampedAmount = (int) Math.min(amount, Integer.MAX_VALUE);
-                return capability.receiveEnergy(clampedAmount, simulate);
-            }
-
-            @Override
-            public long extractEnergy(final long amount, final boolean simulate) {
-                final int clampedAmount = (int) Math.min(amount, Integer.MAX_VALUE);
-                return capability.extractEnergy(clampedAmount, simulate);
-            }
-
-            @Override
-            public long getEnergyStored() {
-                return capability.getEnergyStored();
-            }
-
-            @Override
-            public long getMaxEnergyStored() {
-                return capability.getMaxEnergyStored();
-            }
-        });
+        // TODO(26.1 capability rework): re-expose the scanner energy via Capabilities.Energy
+        // (EnergyHandler/ItemAccess) — the 1.21.1 IEnergyStorage holder was removed in 26.1.
+        // See Capabilities.initialize(). Stubbed to compile; energy is inert until rewritten.
+        return Optional.empty();
     }
 
     long receiveEnergy(long amount, boolean simulate);

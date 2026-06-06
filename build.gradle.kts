@@ -41,6 +41,10 @@ neoForge {
 
 sourceSets.main.get().resources.srcDir("src/generated/resources")
 
+// The datagen providers target the 1.21.1 datagen API; excluded from compilation pending
+// the 26.1 datagen-API migration. Generated resources (src/generated) are already committed.
+sourceSets.main.get().java.exclude("li/cil/scannable/data/**")
+
 tasks.withType<JavaCompile>().configureEach {
     options.encoding = "UTF-8"
     options.release = 25
