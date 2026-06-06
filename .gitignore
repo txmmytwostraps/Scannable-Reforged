@@ -47,3 +47,8 @@ logs/
 /DEV_NOTES.md.mc1.21.1.bak
 /scannable_neoforge_1.21.1_port_plan.md
 /scannable_reforged_26.1.2_port_plan.md
+
+# Local scratch / build logs (not part of the mod)
+orig-*.txt
+compile-out.txt
+runclient-out.txt
