@@ -8,6 +8,7 @@ import com.mojang.blaze3d.platform.CompareOp;
 import com.mojang.blaze3d.shaders.UniformType;
 import com.mojang.blaze3d.vertex.DefaultVertexFormat;
 import com.mojang.blaze3d.vertex.VertexFormat;
+import java.util.Optional;
 import li.cil.scannable.api.API;
 import net.minecraft.client.renderer.RenderPipelines;
 import net.minecraft.client.renderer.rendertype.RenderSetup;
@@ -67,7 +68,9 @@ public final class ScanResultRenderType {
         .withUniform("Projection", UniformType.UNIFORM_BUFFER)
         .withUniform("ScanInfo", UniformType.UNIFORM_BUFFER)
         .withColorTargetState(new ColorTargetState(BlendFunction.ADDITIVE))
-        .withDepthStencilState(new DepthStencilState(CompareOp.ALWAYS_PASS, false))
+        // No depth-stencil state: this fullscreen pass reads depth via the DepthSampler, not as a
+        // depth attachment, so the pipeline must not request one (avoids the GlCommandEncoder warning).
+        .withDepthStencilState(Optional.empty())
         .withCull(false)
         .withVertexFormat(DefaultVertexFormat.EMPTY, VertexFormat.Mode.TRIANGLES)
         .build();
