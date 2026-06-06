@@ -4,7 +4,7 @@ import li.cil.scannable.api.API;
 import li.cil.scannable.common.container.ScannerContainerMenu;
 import net.neoforged.api.distmarker.Dist;
 import net.neoforged.api.distmarker.OnlyIn;
-import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.client.gui.GuiGraphicsExtractor;
 import net.minecraft.client.gui.screens.inventory.AbstractContainerScreen;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.Identifier;
@@ -33,35 +33,35 @@ public class ScannerContainerScreen extends AbstractContainerScreen<ScannerConta
     }
 
     // --------------------------------------------------------------------- //
+    // 1.21.6 extract-model GUI: draw the background in extractContents (no more renderBg),
+    // labels via extractLabels/graphics.text, custom tooltips via extractTooltip.
 
     @Override
-    public void render(final GuiGraphics graphics, final int mouseX, final int mouseY, final float partialTicks) {
-        renderBackground(graphics, mouseX, mouseY, partialTicks);
-        super.render(graphics, mouseX, mouseY, partialTicks);
-
-        if (isHovering(8, 23, font.width(SCANNER_MODULES_TEXT), font.lineHeight, mouseX, mouseY)) {
-            graphics.renderTooltip(font, SCANNER_MODULES_TOOLTIP, mouseX, mouseY);
-        }
-        if (isHovering(8, 49, font.width(SCANNER_MODULES_INACTIVE_TEXT), font.lineHeight, mouseX, mouseY)) {
-            graphics.renderTooltip(font, SCANNER_MODULES_INACTIVE_TOOLTIP, mouseX, mouseY);
-        }
-
-        renderTooltip(graphics, mouseX, mouseY);
-    }
-
-    @Override
-    protected void renderLabels(final GuiGraphics graphics, final int mouseX, final int mouseY) {
-        super.renderLabels(graphics, mouseX, mouseY);
-
-        graphics.drawString(font, SCANNER_MODULES_TEXT, 8, 23, 0x404040, false);
-        graphics.drawString(font, SCANNER_MODULES_INACTIVE_TEXT, 8, 49, 0x404040, false);
-    }
-
-    @Override
-    protected void renderBg(final GuiGraphics graphics, final float partialTicks, final int mouseX, final int mouseY) {
+    public void extractContents(final GuiGraphicsExtractor graphics, final int mouseX, final int mouseY, final float partialTick) {
         final int x = (width - imageWidth) / 2;
         final int y = (height - imageHeight) / 2;
-        graphics.blit(BACKGROUND, x, y, 0, 0, imageWidth, imageHeight);
+        graphics.blit(BACKGROUND, x, y, x + imageWidth, y + imageHeight, 0.0f, imageWidth / 256.0f, 0.0f, imageHeight / 256.0f);
+        super.extractContents(graphics, mouseX, mouseY, partialTick);
+    }
+
+    @Override
+    protected void extractLabels(final GuiGraphicsExtractor graphics, final int mouseX, final int mouseY) {
+        super.extractLabels(graphics, mouseX, mouseY);
+
+        graphics.text(font, SCANNER_MODULES_TEXT, 8, 23, 0xFF404040, false);
+        graphics.text(font, SCANNER_MODULES_INACTIVE_TEXT, 8, 49, 0xFF404040, false);
+    }
+
+    @Override
+    protected void extractTooltip(final GuiGraphicsExtractor graphics, final int mouseX, final int mouseY) {
+        super.extractTooltip(graphics, mouseX, mouseY);
+
+        if (isHovering(8, 23, font.width(SCANNER_MODULES_TEXT), font.lineHeight, mouseX, mouseY)) {
+            graphics.setTooltipForNextFrame(SCANNER_MODULES_TOOLTIP, mouseX, mouseY);
+        }
+        if (isHovering(8, 49, font.width(SCANNER_MODULES_INACTIVE_TEXT), font.lineHeight, mouseX, mouseY)) {
+            graphics.setTooltipForNextFrame(SCANNER_MODULES_INACTIVE_TOOLTIP, mouseX, mouseY);
+        }
     }
 
     @Override
