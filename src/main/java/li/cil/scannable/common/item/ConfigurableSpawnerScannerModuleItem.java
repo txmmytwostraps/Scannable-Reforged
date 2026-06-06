@@ -1,7 +1,7 @@
 package li.cil.scannable.common.item;
 
 import li.cil.scannable.common.config.Strings;
-import li.cil.scannable.common.container.EntityModuleContainerMenu;
+import li.cil.scannable.common.container.SpawnerModuleContainerMenu;
 import li.cil.scannable.common.scanning.ConfigurableSpawnerScannerModule;
 import net.minecraft.network.chat.Component;
 import net.minecraft.server.level.ServerPlayer;
@@ -45,7 +45,7 @@ public final class ConfigurableSpawnerScannerModuleItem extends ScannerModuleIte
 
         final List<EntityType<?>> entities = ConfigurableEntityScannerModuleItem.getEntityTypes(stack);
         if (!entities.isEmpty()) {
-            tooltip.accept(Strings.TOOLTIP_ENTITIES_LIST_CAPTION);
+            tooltip.accept(Strings.TOOLTIP_SPAWNERS_LIST_CAPTION);
             entities.forEach(e -> tooltip.accept(Strings.listItem(e.getDescription())));
         }
     }
@@ -66,7 +66,7 @@ public final class ConfigurableSpawnerScannerModuleItem extends ScannerModuleIte
 
                 @Override
                 public AbstractContainerMenu createMenu(final int id, final Inventory inventory, final Player player) {
-                    return new EntityModuleContainerMenu(id, inventory, hand);
+                    return new SpawnerModuleContainerMenu(id, inventory, hand);
                 }
             }, buffer -> buffer.writeEnum(hand));
         }

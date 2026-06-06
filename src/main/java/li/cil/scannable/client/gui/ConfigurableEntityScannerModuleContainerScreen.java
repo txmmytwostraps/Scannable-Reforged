@@ -30,7 +30,13 @@ public class ConfigurableEntityScannerModuleContainerScreen extends AbstractConf
     private final Map<EntityType<?>, Optional<LivingEntity>> renderEntities = new HashMap<>();
 
     public ConfigurableEntityScannerModuleContainerScreen(final EntityModuleContainerMenu container, final Inventory inventory, final Component title) {
-        super(container, inventory, title, Strings.GUI_ENTITIES_LIST_CAPTION);
+        this(container, inventory, title, Strings.GUI_ENTITIES_LIST_CAPTION);
+    }
+
+    // Lets the spawner module subclass reuse this whole screen (incl. the mob previews) with its own
+    // list caption.
+    protected ConfigurableEntityScannerModuleContainerScreen(final EntityModuleContainerMenu container, final Inventory inventory, final Component title, final Component listCaption) {
+        super(container, inventory, title, listCaption);
     }
 
     // --------------------------------------------------------------------- //

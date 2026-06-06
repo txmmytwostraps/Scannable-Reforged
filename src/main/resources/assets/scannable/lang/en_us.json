@@ -26,7 +26,8 @@
   "item.scannable.chest_module": "Scanner Module: Chests",
   "item.scannable.chest_module.desc": "Detects storage blocks (e.g. chests, barrels, shulker boxes).",
   "item.scannable.spawner_module": "Scanner Module: Spawners",
-  "item.scannable.spawner_module.desc": "Detects mob spawners.",
+  "item.scannable.spawner_module.desc": "Detects mob spawners, optionally filtered by the mob they spawn. Use on a spawner or an entity to add it, or use on air to manage the configuration.",
+  "item.scannable.spawner_module.list": "Configured spawners:",
   "tooltip.scannable.module.energy_cost": "Energy cost: %s",
   "tooltip.scannable.list_item": "§7- §f%s§r",
 
@@ -37,6 +38,7 @@
   "gui.scannable.scanner.progress": "Charging... %s%%",
   "gui.scannable.block_module.list": "Blocks",
   "gui.scannable.entity_module.list": "Entities",
+  "gui.scannable.spawner_module.list": "Spawners",
   "gui.scannable.overlay.distance": "%s (%sm)",
   "gui.scannable.overlay.spawner": "%s Spawner",
 

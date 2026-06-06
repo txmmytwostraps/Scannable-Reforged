@@ -15,6 +15,7 @@ public final class Containers {
     public static final DeferredHolder<MenuType<?>, MenuType<ScannerContainerMenu>> SCANNER_CONTAINER = CONTAINERS.register("scanner", () -> IMenuTypeExtension.create(ScannerContainerMenu::create));
     public static final DeferredHolder<MenuType<?>, MenuType<BlockModuleContainerMenu>> BLOCK_MODULE_CONTAINER = CONTAINERS.register("block_module", () -> IMenuTypeExtension.create(BlockModuleContainerMenu::create));
     public static final DeferredHolder<MenuType<?>, MenuType<EntityModuleContainerMenu>> ENTITY_MODULE_CONTAINER = CONTAINERS.register("entity_module", () -> IMenuTypeExtension.create(EntityModuleContainerMenu::create));
+    public static final DeferredHolder<MenuType<?>, MenuType<SpawnerModuleContainerMenu>> SPAWNER_MODULE_CONTAINER = CONTAINERS.register("spawner_module", () -> IMenuTypeExtension.create(SpawnerModuleContainerMenu::create));
 
     // --------------------------------------------------------------------- //
 

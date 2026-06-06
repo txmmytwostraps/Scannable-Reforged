@@ -6,9 +6,10 @@ import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.resources.Identifier;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.entity.player.Inventory;
+import net.minecraft.world.inventory.MenuType;
 import net.minecraft.world.item.ItemStack;
 
-public final class EntityModuleContainerMenu extends AbstractModuleContainerMenu {
+public class EntityModuleContainerMenu extends AbstractModuleContainerMenu {
     public static EntityModuleContainerMenu create(final int windowId, final Inventory inventory, final FriendlyByteBuf buffer) {
         final InteractionHand hand = buffer.readEnum(InteractionHand.class);
         return new EntityModuleContainerMenu(windowId, inventory, hand);
@@ -18,6 +19,11 @@ public final class EntityModuleContainerMenu extends AbstractModuleContainerMenu
 
     public EntityModuleContainerMenu(final int windowId, final Inventory inventory, final InteractionHand hand) {
         super(Containers.ENTITY_MODULE_CONTAINER.get(), windowId, inventory, hand);
+    }
+
+    // The spawner module reuses this menu's entity-type editing under its own menu type.
+    protected EntityModuleContainerMenu(final MenuType<?> type, final int windowId, final Inventory inventory, final InteractionHand hand) {
+        super(type, windowId, inventory, hand);
     }
 
     @Override
