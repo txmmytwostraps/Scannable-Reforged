@@ -25,7 +25,7 @@ dependencies {
 }
 
 neoForge {
-    version = "26.1.2.73"
+    version = "26.1.2.71"
 
     mods {
         register(modId) {
@@ -75,7 +75,7 @@ tasks.named<ProcessResources>("processResources") {
     val props = mapOf(
         "version" to version.toString(),
         "minecraftVersion" to "26.1.2",
-        "neoforgeVersion" to "26.1.2.73",
+        "neoforgeVersion" to "26.1.2.71",
         "loaderVersion" to "1",
     )
     inputs.properties(props)
