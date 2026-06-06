@@ -76,6 +76,15 @@ public final class ScanResultRenderType {
 
     public static final RenderType SHIMMER_TYPE = RenderType.create(API.MOD_ID + ":scan_shimmer", RenderSetup.builder(SHIMMER_PIPELINE).createRenderSetup());
 
+    // HUD scan-progress ring: a textured, two-sided, TRIANGLES pie (the clock-wipe fan). Derived
+    // from the GUI textured snippet but with cull off (the fan winding is mixed) and TRIANGLES mode
+    // (each wedge is its own triangle — no degenerate quads).
+    public static final RenderPipeline SCAN_PROGRESS_PIPELINE = RenderPipeline.builder(RenderPipelines.GUI_TEXTURED_SNIPPET)
+        .withLocation(Identifier.fromNamespaceAndPath(API.MOD_ID, "pipeline/scan_progress"))
+        .withCull(false)
+        .withVertexFormat(DefaultVertexFormat.POSITION_TEX_COLOR, VertexFormat.Mode.TRIANGLES)
+        .build();
+
     // Fullscreen scan-reveal effect: samples the main depth buffer and additively paints the
     // expanding spherical wave. No vertex buffer (core/screenquad generates the fullscreen triangle
     // from gl_VertexID); no depth test/write; additive blend. Drawn via a manual RenderPass in

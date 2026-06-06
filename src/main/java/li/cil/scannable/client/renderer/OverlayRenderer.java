@@ -1,9 +1,6 @@
 package li.cil.scannable.client.renderer;
 
 import com.mojang.blaze3d.pipeline.RenderPipeline;
-import com.mojang.blaze3d.systems.RenderSystem;
-import com.mojang.blaze3d.textures.FilterMode;
-import com.mojang.blaze3d.textures.GpuSampler;
 import com.mojang.blaze3d.vertex.VertexConsumer;
 import li.cil.scannable.api.API;
 import li.cil.scannable.common.config.Strings;
@@ -12,7 +9,6 @@ import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphicsExtractor;
 import net.minecraft.client.gui.navigation.ScreenRectangle;
 import net.minecraft.client.gui.render.TextureSetup;
-import net.minecraft.client.renderer.RenderPipelines;
 import net.minecraft.client.renderer.state.gui.GuiElementRenderState;
 import net.minecraft.client.renderer.texture.AbstractTexture;
 import net.minecraft.network.chat.Component;
@@ -61,8 +57,7 @@ public final class OverlayRenderer {
         final int midY = graphics.guiHeight() / 2;
 
         final AbstractTexture texture = mc.getTextureManager().getTexture(PROGRESS);
-        final GpuSampler sampler = RenderSystem.getSamplerCache().getClampToEdge(FilterMode.NEAREST);
-        final TextureSetup textureSetup = TextureSetup.singleTexture(texture.getTextureView(), sampler);
+        final TextureSetup textureSetup = TextureSetup.singleTexture(texture.getTextureView(), texture.getSampler());
 
         final Matrix3x2f pose = new Matrix3x2f(graphics.pose());
         final ScreenRectangle bounds = new ScreenRectangle(midX - half, midY - half, SIZE, SIZE);
@@ -82,7 +77,7 @@ public final class OverlayRenderer {
                                        ScreenRectangle bounds) implements GuiElementRenderState {
         @Override
         public RenderPipeline pipeline() {
-            return RenderPipelines.GUI_TEXTURED;
+            return ScanResultRenderType.SCAN_PROGRESS_PIPELINE;
         }
 
         @Nullable
@@ -106,12 +101,9 @@ public final class OverlayRenderer {
 
             final float[] center = {midX, midY, 0.5f, 0.5f};
             for (int i = 0; i + 1 < points.size(); i++) {
-                final float[] a = points.get(i);
-                final float[] b = points.get(i + 1);
                 vertex(buffer, center);
-                vertex(buffer, a);
-                vertex(buffer, b);
-                vertex(buffer, b); // degenerate 4th vertex (triangle as a quad)
+                vertex(buffer, points.get(i));
+                vertex(buffer, points.get(i + 1));
             }
         }
 

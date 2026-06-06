@@ -51,6 +51,7 @@ public final class ClientSetupNeoForge {
         event.registerPipeline(ScanResultRenderType.ICON_PIPELINE);
         event.registerPipeline(ScanResultRenderType.SCAN_EFFECT_PIPELINE);
         event.registerPipeline(ScanResultRenderType.SHIMMER_PIPELINE);
+        event.registerPipeline(ScanResultRenderType.SCAN_PROGRESS_PIPELINE);
     }
 
     @SubscribeEvent
