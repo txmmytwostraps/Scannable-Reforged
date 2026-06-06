@@ -7,7 +7,7 @@ import li.cil.scannable.common.network.Network;
 import li.cil.scannable.common.network.message.RemoveConfiguredModuleItemAtMessage;
 import net.neoforged.api.distmarker.Dist;
 import net.neoforged.api.distmarker.OnlyIn;
-import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.client.gui.GuiGraphicsExtractor;
 import net.minecraft.client.gui.screens.inventory.AbstractContainerScreen;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.Identifier;
@@ -49,36 +49,26 @@ public abstract class AbstractConfigurableScannerModuleContainerScreen<TContaine
 
     protected abstract Component getItemName(final TItem item);
 
-    protected abstract void renderConfiguredItem(final GuiGraphics graphics, final TItem item, final int x, final int y);
+    protected abstract void renderConfiguredItem(final GuiGraphicsExtractor graphics, final TItem item, final int x, final int y);
 
     protected void configureItemAt(final ItemStack stack, final int slot, final ItemStack value) {
     }
 
     // --------------------------------------------------------------------- //
+    // 1.21.6 extract-model GUI (see ScannerContainerScreen).
 
     @Override
-    public void render(final GuiGraphics graphics, final int mouseX, final int mouseY, final float partialTicks) {
-        renderBackground(graphics, mouseX, mouseY, partialTicks);
-        super.render(graphics, mouseX, mouseY, partialTicks);
-        renderTooltip(graphics, mouseX, mouseY);
-
-        final ItemStack stack = getHeldItem();
-        final List<TItem> items = getConfiguredItems(stack);
-        for (int slot = 0; slot < Math.min(items.size(), Constants.CONFIGURABLE_MODULE_SLOTS); slot++) {
-            final int x = SLOTS_ORIGIN_X + slot * SLOT_SIZE;
-            final int y = SLOTS_ORIGIN_Y;
-
-            if (isHovering(x, y, 16, 16, mouseX, mouseY)) {
-                final TItem item = items.get(slot);
-                graphics.renderTooltip(font, getItemName(item), mouseX, mouseY);
-            }
-        }
+    public void extractContents(final GuiGraphicsExtractor graphics, final int mouseX, final int mouseY, final float partialTick) {
+        final int x = (width - imageWidth) / 2;
+        final int y = (height - imageHeight) / 2;
+        graphics.blit(BACKGROUND, x, y, x + imageWidth, y + imageHeight, 0.0f, imageWidth / 256.0f, 0.0f, imageHeight / 256.0f);
+        super.extractContents(graphics, mouseX, mouseY, partialTick);
     }
 
     @Override
-    protected void renderLabels(final GuiGraphics graphics, final int mouseX, final int mouseY) {
-        super.renderLabels(graphics, mouseX, mouseY);
-        graphics.drawString(font, listCaption, 8, 23, 0x404040, false);
+    protected void extractLabels(final GuiGraphicsExtractor graphics, final int mouseX, final int mouseY) {
+        super.extractLabels(graphics, mouseX, mouseY);
+        graphics.text(font, listCaption, 8, 23, 0xFF404040, false);
 
         final ItemStack stack = getHeldItem();
         final List<TItem> items = getConfiguredItems(stack);
@@ -87,21 +77,29 @@ public abstract class AbstractConfigurableScannerModuleContainerScreen<TContaine
             final int y = SLOTS_ORIGIN_Y;
 
             if (isHovering(x, y, 16, 16, mouseX, mouseY)) {
-                renderSlotHighlight(graphics, x, y, 400);
+                graphics.fill(x, y, x + 16, y + 16, 0x80FFFFFF);
             }
 
             if (slot < items.size()) {
-                final TItem item = items.get(slot);
-                renderConfiguredItem(graphics, item, x, y);
+                renderConfiguredItem(graphics, items.get(slot), x, y);
             }
         }
     }
 
     @Override
-    protected void renderBg(final GuiGraphics graphics, final float partialTicks, final int mouseX, final int mouseY) {
-        final int x = (width - imageWidth) / 2;
-        final int y = (height - imageHeight) / 2;
-        graphics.blit(BACKGROUND, x, y, 0, 0, imageWidth, imageHeight);
+    protected void extractTooltip(final GuiGraphicsExtractor graphics, final int mouseX, final int mouseY) {
+        super.extractTooltip(graphics, mouseX, mouseY);
+
+        final ItemStack stack = getHeldItem();
+        final List<TItem> items = getConfiguredItems(stack);
+        for (int slot = 0; slot < Math.min(items.size(), Constants.CONFIGURABLE_MODULE_SLOTS); slot++) {
+            final int x = SLOTS_ORIGIN_X + slot * SLOT_SIZE;
+            final int y = SLOTS_ORIGIN_Y;
+
+            if (isHovering(x, y, 16, 16, mouseX, mouseY)) {
+                graphics.setTooltipForNextFrame(getItemName(items.get(slot)), mouseX, mouseY);
+            }
+        }
     }
 
     @Override

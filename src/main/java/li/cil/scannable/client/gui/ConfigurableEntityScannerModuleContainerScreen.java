@@ -1,6 +1,5 @@
 package li.cil.scannable.client.gui;
 
-import com.mojang.blaze3d.vertex.PoseStack;
 import li.cil.scannable.common.config.Strings;
 import li.cil.scannable.common.container.EntityModuleContainerMenu;
 import li.cil.scannable.common.item.ConfigurableEntityScannerModuleItem;
@@ -8,30 +7,18 @@ import li.cil.scannable.common.network.Network;
 import li.cil.scannable.common.network.message.SetConfiguredModuleItemAtMessage;
 import net.neoforged.api.distmarker.Dist;
 import net.neoforged.api.distmarker.OnlyIn;
-import net.minecraft.client.Minecraft;
-import net.minecraft.client.gui.GuiGraphics;
-import net.minecraft.client.renderer.entity.EntityRenderDispatcher;
+import net.minecraft.client.gui.GuiGraphicsExtractor;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.network.chat.Component;
-import net.minecraft.world.entity.Entity;
-import net.minecraft.world.entity.EntityDimensions;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.SpawnEggItem;
-import org.joml.Quaternionf;
 
-import javax.annotation.Nullable;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
-
-import static li.cil.scannable.util.UnitConversion.toRadians;
 
 @OnlyIn(Dist.CLIENT)
 public class ConfigurableEntityScannerModuleContainerScreen extends AbstractConfigurableScannerModuleContainerScreen<EntityModuleContainerMenu, EntityType<?>> {
-    private static final Map<EntityType<?>, Entity> RENDER_ENTITIES = new HashMap<>();
-
     public ConfigurableEntityScannerModuleContainerScreen(final EntityModuleContainerMenu container, final Inventory inventory, final Component title) {
         super(container, inventory, title, Strings.GUI_ENTITIES_LIST_CAPTION);
     }
@@ -49,8 +36,11 @@ public class ConfigurableEntityScannerModuleContainerScreen extends AbstractConf
     }
 
     @Override
-    protected void renderConfiguredItem(final GuiGraphics graphics, final EntityType<?> entityType, final int x, final int y) {
-        renderEntity(graphics, x + 8, y + 13, entityType);
+    protected void renderConfiguredItem(final GuiGraphicsExtractor graphics, final EntityType<?> entityType, final int x, final int y) {
+        // TODO(Phase 3): render a live entity preview. GUI entity rendering was reworked in 1.21.6
+        // (graphics.pose() is now a 2D Matrix3x2fStack; entity rendering goes through a submit /
+        // render-state path). Stubbed to a blank slot for the launchable build; configured entities
+        // are still listed via the hover tooltip.
     }
 
     @Override
@@ -58,44 +48,7 @@ public class ConfigurableEntityScannerModuleContainerScreen extends AbstractConf
         if (value.getItem() instanceof SpawnEggItem) {
             final EntityType<?> entityType = ((SpawnEggItem) value.getItem()).getType(value);
             BuiltInRegistries.ENTITY_TYPE.getResourceKey(entityType).ifPresent(entityTypeResourceKey ->
-                    Network.sendToServer(new SetConfiguredModuleItemAtMessage(menu.containerId, slot, entityTypeResourceKey.location())));
+                    Network.sendToServer(new SetConfiguredModuleItemAtMessage(menu.containerId, slot, entityTypeResourceKey.identifier())));
         }
-    }
-
-    private void renderEntity(final GuiGraphics graphics, final int x, final int y, final EntityType<?> entityType) {
-        final Entity entity = getRenderEntity(entityType);
-        if (entity == null) {
-            return;
-        }
-
-        entity.setLevel(menu.getPlayer().level());
-        final EntityDimensions bounds = entityType.getDimensions();
-        final float size = Math.max(bounds.width(), bounds.height());
-        final float scale = 11.0f / size;
-
-        final PoseStack poseStack = graphics.pose();
-        poseStack.pushPose();
-
-        poseStack.translate(x, y, 100);
-        poseStack.scale(scale, scale, scale);
-        final var quaternion = new Quaternionf().rotationZ(toRadians(180));
-        quaternion.mul(new Quaternionf().rotationX(toRadians(20)));
-        quaternion.mul(new Quaternionf().rotationY(toRadians(30)));
-        poseStack.mulPose(quaternion);
-
-        final EntityRenderDispatcher renderManager = Minecraft.getInstance().getEntityRenderDispatcher();
-        quaternion.conjugate();
-        renderManager.overrideCameraOrientation(quaternion);
-        renderManager.setRenderShadow(false);
-
-        renderManager.render(entity, 0, 0, 0, 0, 1, poseStack, graphics.bufferSource(), 0xf000f0);
-
-        renderManager.setRenderShadow(true);
-        poseStack.popPose();
-    }
-
-    @Nullable
-    private Entity getRenderEntity(final EntityType<?> entityType) {
-        return RENDER_ENTITIES.computeIfAbsent(entityType, t -> t.create(menu.getPlayer().level()));
     }
 }

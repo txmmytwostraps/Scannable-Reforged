@@ -6,19 +6,14 @@ import li.cil.scannable.client.ScanManager;
 import li.cil.scannable.client.gui.ConfigurableBlockScannerModuleContainerScreen;
 import li.cil.scannable.client.gui.ConfigurableEntityScannerModuleContainerScreen;
 import li.cil.scannable.client.gui.ScannerContainerScreen;
-import li.cil.scannable.client.renderer.OverlayRenderer;
-import li.cil.scannable.client.renderer.ScannerRenderer;
 import li.cil.scannable.common.container.Containers;
-import net.minecraft.resources.Identifier;
 import net.neoforged.api.distmarker.Dist;
 import net.neoforged.api.distmarker.OnlyIn;
 import net.neoforged.bus.api.SubscribeEvent;
 import net.neoforged.fml.common.EventBusSubscriber;
 import net.neoforged.fml.event.lifecycle.FMLClientSetupEvent;
 import net.neoforged.neoforge.client.event.ClientTickEvent;
-import net.neoforged.neoforge.client.event.RegisterGuiLayersEvent;
 import net.neoforged.neoforge.client.event.RegisterMenuScreensEvent;
-import net.neoforged.neoforge.client.event.RenderLevelStageEvent;
 import net.neoforged.neoforge.common.NeoForge;
 
 @OnlyIn(Dist.CLIENT)
@@ -29,7 +24,12 @@ public final class ClientSetupNeoForge {
         ClientSetup.initialize();
 
         NeoForge.EVENT_BUS.addListener(ClientSetupNeoForge::handleClientTickEvent);
-        NeoForge.EVENT_BUS.addListener(ClientSetupNeoForge::handleRenderLevelEvent);
+
+        // TODO(Phase 3): re-add the world render hook (RenderLevelStageEvent.AFTER_LEVEL ->
+        // ScannerRenderer.render + ScanManager world rendering) and the GUI overlay layer
+        // (RegisterGuiLayersEvent -> OverlayRenderer) once the scan-effect + result rendering are
+        // rebuilt. The 1.21.1 hooks used RenderLevelStageEvent.Stage/getModelViewMatrix/
+        // getProjectionMatrix and a GuiGraphics layer, all changed in 26.1.
     }
 
     @SubscribeEvent
@@ -39,29 +39,7 @@ public final class ClientSetupNeoForge {
         event.register(Containers.ENTITY_MODULE_CONTAINER.get(), ConfigurableEntityScannerModuleContainerScreen::new);
     }
 
-    @SubscribeEvent
-    public static void handleRegisterLayersEvent(final RegisterGuiLayersEvent event) {
-        event.registerAboveAll(Identifier.fromNamespaceAndPath(API.MOD_ID, "scanner_results"), (guiGraphics, deltaTracker) -> {
-            final float partialTick = deltaTracker.getGameTimeDeltaPartialTick(false);
-            ScanManager.renderGui(partialTick);
-            OverlayRenderer.render(guiGraphics, partialTick);
-        });
-    }
-
     public static void handleClientTickEvent(final ClientTickEvent.Post event) {
         ScanManager.tick();
-    }
-
-    public static void handleRenderLevelEvent(final RenderLevelStageEvent event) {
-        if (event.getStage() == RenderLevelStageEvent.Stage.AFTER_LEVEL) {
-            // Render the scan-effect wave from this stable hook (NeoForge's
-            // RenderLevelStageEvent) rather than a mid-renderLevel mixin, so the
-            // depth grab and fullscreen blit see a consistent framebuffer every
-            // frame. This is the same hook the scan results render from.
-            ScannerRenderer.render(event.getModelViewMatrix(), event.getProjectionMatrix());
-
-            ScanManager.setMatrices(event.getModelViewMatrix(), event.getProjectionMatrix());
-            ScanManager.renderLevel(event.getPartialTick().getGameTimeDeltaPartialTick(false));
-        }
     }
 }

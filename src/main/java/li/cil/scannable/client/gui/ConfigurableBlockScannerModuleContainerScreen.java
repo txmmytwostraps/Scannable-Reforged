@@ -7,7 +7,7 @@ import li.cil.scannable.common.network.Network;
 import li.cil.scannable.common.network.message.SetConfiguredModuleItemAtMessage;
 import net.neoforged.api.distmarker.Dist;
 import net.neoforged.api.distmarker.OnlyIn;
-import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.client.gui.GuiGraphicsExtractor;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.network.chat.Component;
 import net.minecraft.world.entity.player.Inventory;
@@ -36,8 +36,8 @@ public class ConfigurableBlockScannerModuleContainerScreen extends AbstractConfi
     }
 
     @Override
-    protected void renderConfiguredItem(final GuiGraphics graphics, final Block block, final int x, final int y) {
-        graphics.renderFakeItem(new ItemStack(block.asItem()), x, y);
+    protected void renderConfiguredItem(final GuiGraphicsExtractor graphics, final Block block, final int x, final int y) {
+        graphics.item(new ItemStack(block.asItem()), x, y);
     }
 
     @Override
@@ -45,7 +45,7 @@ public class ConfigurableBlockScannerModuleContainerScreen extends AbstractConfi
         final Block block = Block.byItem(value.getItem());
         if (block != Blocks.AIR) {
             BuiltInRegistries.BLOCK.getResourceKey(block).ifPresent(blockResourceKey ->
-                Network.sendToServer(new SetConfiguredModuleItemAtMessage(menu.containerId, slot, blockResourceKey.location())));
+                Network.sendToServer(new SetConfiguredModuleItemAtMessage(menu.containerId, slot, blockResourceKey.identifier())));
         }
     }
 }
