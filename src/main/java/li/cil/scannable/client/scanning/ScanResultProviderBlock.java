@@ -229,7 +229,9 @@ public final class ScanResultProviderBlock extends AbstractScanResultProvider {
                 continue;
             }
             final int c = ((BlockScanResult) result).color;
-            addBox(buffer, pose, bounds, ((c >> 16) & 0xFF) / 255.0f, ((c >> 8) & 0xFF) / 255.0f, (c & 0xFF) / 255.0f, 0.45f);
+            // Inflate slightly so the highlight floats just outside the block faces (avoids the
+            // coplanar look) and keep the fill subtle so the ore stays visible through it.
+            addBox(buffer, pose, bounds.inflate(0.01), ((c >> 16) & 0xFF) / 255.0f, ((c >> 8) & 0xFF) / 255.0f, (c & 0xFF) / 255.0f, 0.28f);
         }
     }
 
