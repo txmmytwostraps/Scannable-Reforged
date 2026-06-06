@@ -16,6 +16,9 @@ forge-platform = "1.20.4-49.0.41"
 neoforge-platform = "21.1.233"
 neoforge-loader = "1"
 
+# Optional integration (compile-only, dev-runtime-only; never bundled).
+lootr = "1.21.1-1.11.37.121"
+
 [plugins]
 loom = { id = "dev.architectury.loom", version = "1.7-SNAPSHOT" }
 architectury = { id = "architectury-plugin", version = "3.4-SNAPSHOT" }
@@ -42,3 +45,6 @@ forge-architectury = { group = "dev.architectury", name = "architectury-forge", 
 
 neoforge-platform = { group = "net.neoforged", name = "neoforge", version.ref = "neoforge-platform" }
 neoforge-architectury = { group = "dev.architectury", name = "architectury-neoforge", version.ref = "architectury" }
+
+# Lootr (NeoForge) - optional integration for the Lootr scanner module.
+lootr = { group = "noobanidus.mods.lootr", name = "lootr-neoforge", version.ref = "lootr" }

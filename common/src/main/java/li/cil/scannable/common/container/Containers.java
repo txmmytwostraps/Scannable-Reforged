@@ -15,6 +15,7 @@ public final class Containers {
     public static final RegistrySupplier<MenuType<ScannerContainerMenu>> SCANNER_CONTAINER = CONTAINERS.register("scanner", () -> MenuRegistry.ofExtended(ScannerContainerMenu::create));
     public static final RegistrySupplier<MenuType<BlockModuleContainerMenu>> BLOCK_MODULE_CONTAINER = CONTAINERS.register("block_module", () -> MenuRegistry.ofExtended(BlockModuleContainerMenu::create));
     public static final RegistrySupplier<MenuType<EntityModuleContainerMenu>> ENTITY_MODULE_CONTAINER = CONTAINERS.register("entity_module", () -> MenuRegistry.ofExtended(EntityModuleContainerMenu::create));
+    public static final RegistrySupplier<MenuType<SpawnerModuleContainerMenu>> SPAWNER_MODULE_CONTAINER = CONTAINERS.register("spawner_module", () -> MenuRegistry.ofExtended(SpawnerModuleContainerMenu::create));
 
     // --------------------------------------------------------------------- //
 

@@ -34,6 +34,7 @@ public final class ModItemModelProvider extends ItemModelProvider {
         registerModule(Items.FLUID_MODULE.get());
         registerModule(Items.CHEST_MODULE.get());
         registerModule(Items.SPAWNER_MODULE.get());
+        registerModule(Items.LOOTR_MODULE.get());
     }
 
     private ItemModelBuilder begin(final Item item) {

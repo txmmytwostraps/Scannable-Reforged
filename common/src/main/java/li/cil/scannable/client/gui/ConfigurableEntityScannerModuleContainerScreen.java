@@ -36,6 +36,11 @@ public class ConfigurableEntityScannerModuleContainerScreen extends AbstractConf
         super(container, inventory, title, Strings.GUI_ENTITIES_LIST_CAPTION);
     }
 
+    // For subclasses (e.g. the spawner module) that reuse the mob-slot UI with a different caption.
+    protected ConfigurableEntityScannerModuleContainerScreen(final EntityModuleContainerMenu container, final Inventory inventory, final Component title, final Component listCaption) {
+        super(container, inventory, title, listCaption);
+    }
+
     // --------------------------------------------------------------------- //
 
     @Override

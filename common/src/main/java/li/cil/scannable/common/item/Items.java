@@ -24,7 +24,8 @@ public final class Items {
     public static final RegistrySupplier<Item> RARE_ORES_MODULE = ITEMS.register("rare_ores_module", () -> new ScannerModuleItem(RareOresBlockScannerModule.INSTANCE));
     public static final RegistrySupplier<Item> FLUID_MODULE = ITEMS.register("fluid_module", () -> new ScannerModuleItem(FluidBlockScannerModule.INSTANCE));
     public static final RegistrySupplier<Item> CHEST_MODULE = ITEMS.register("chest_module", () -> new ScannerModuleItem(ChestScannerModule.INSTANCE));
-    public static final RegistrySupplier<Item> SPAWNER_MODULE = ITEMS.register("spawner_module", () -> new ScannerModuleItem(SpawnerBlockScannerModule.INSTANCE));
+    public static final RegistrySupplier<Item> SPAWNER_MODULE = ITEMS.register("spawner_module", ConfigurableSpawnerScannerModuleItem::new);
+    public static final RegistrySupplier<Item> LOOTR_MODULE = ITEMS.register("lootr_module", LootrScannerModuleItem::new);
 
     // --------------------------------------------------------------------- //
 

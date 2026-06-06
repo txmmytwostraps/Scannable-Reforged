@@ -59,6 +59,10 @@ public final class CommonConfig {
     @Comment("Amount of energy used by the spawner module per scan.")
     public static int energyCostModuleSpawner = 100;
 
+    @Path("energy") @WorldRestart @Min(0)
+    @Comment("Amount of energy used by the Lootr module per scan.")
+    public static int energyCostModuleLootr = 100;
+
     @Path("range") @WorldRestart @Min(0) @Max(1)
     @Comment("Relative amount of base scan radius added by each installed range module.")
     public static float rangeModifierModuleRange = 0.5f;
@@ -86,6 +90,10 @@ public final class CommonConfig {
     @Path("range") @WorldRestart @Min(0) @Max(1)
     @Comment("Relative effective range of the spawner module.")
     public static float rangeModifierModuleSpawner = 1.0f;
+
+    @Path("range") @WorldRestart @Min(0) @Max(1)
+    @Comment("Relative effective range of the Lootr module.")
+    public static float rangeModifierModuleLootr = 1.0f;
 
     // TODO Migrate to range category in next major version.
     @Path("general") @WorldRestart @Min(16) @Max(128)
@@ -172,6 +180,21 @@ public final class CommonConfig {
     @Comment("Block tags of blocks considered 'spawners', requiring the spawner scanner module.")
     @ItemType(ResourceLocation.class)
     public static Set<ResourceLocation> spawnerBlockTags = new HashSet<>();
+
+    @Path("lootr") @WorldRestart
+    @Comment("Registry names of blocks considered Lootr loot containers, requiring the Lootr scanner module.")
+    @ItemType(ResourceLocation.class)
+    public static Set<ResourceLocation> lootrBlocks = new HashSet<>();
+
+    @Path("lootr") @WorldRestart
+    @Comment("""
+        Block tags of blocks considered Lootr loot containers, requiring the Lootr scanner module.
+        Defaults to lootr:containers (all Lootr chests, barrels, shulkers, pots and brushables).
+        Has no effect unless the Lootr mod is installed.""")
+    @ItemType(ResourceLocation.class)
+    public static Set<ResourceLocation> lootrBlockTags = Util.make(new HashSet<>(), c -> {
+        c.add(ResourceLocation.fromNamespaceAndPath("lootr", "containers"));
+    });
 
     @ExpectPlatform
     private static Set<ResourceLocation> getDefaultCommonOreTags() {

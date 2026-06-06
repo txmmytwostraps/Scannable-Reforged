@@ -5,6 +5,7 @@ import li.cil.scannable.client.ClientSetup;
 import li.cil.scannable.client.ScanManager;
 import li.cil.scannable.client.gui.ConfigurableBlockScannerModuleContainerScreen;
 import li.cil.scannable.client.gui.ConfigurableEntityScannerModuleContainerScreen;
+import li.cil.scannable.client.gui.ConfigurableSpawnerScannerModuleContainerScreen;
 import li.cil.scannable.client.gui.ScannerContainerScreen;
 import li.cil.scannable.client.renderer.OverlayRenderer;
 import li.cil.scannable.client.renderer.ScannerRenderer;
@@ -37,6 +38,7 @@ public final class ClientSetupNeoForge {
         event.register(Containers.SCANNER_CONTAINER.get(), ScannerContainerScreen::new);
         event.register(Containers.BLOCK_MODULE_CONTAINER.get(), ConfigurableBlockScannerModuleContainerScreen::new);
         event.register(Containers.ENTITY_MODULE_CONTAINER.get(), ConfigurableEntityScannerModuleContainerScreen::new);
+        event.register(Containers.SPAWNER_MODULE_CONTAINER.get(), ConfigurableSpawnerScannerModuleContainerScreen::new);
     }
 
     @SubscribeEvent

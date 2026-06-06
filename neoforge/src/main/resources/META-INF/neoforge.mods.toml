@@ -15,10 +15,13 @@ description = '''
 Scan the area for points of interest. Unofficial NeoForge 1.21.1 fork of Scannable by Florian "Sangar" Nücke.
 '''
 
+# Floor is the 1.21.1 NeoForge baseline, NOT the (newer) version we compile against, so the mod loads
+# on packs shipping any 1.21.1 NeoForge (e.g. ATM10 on 21.1.228). 21.1.x patch releases are
+# API-compatible and the mod uses no newer-than-baseline runtime APIs.
 [[dependencies.scannable]]
 modId = "neoforge"
 type = "required"
-versionRange = "[${neoforgeVersion},)"
+versionRange = "[21.1.0,)"
 ordering = "NONE"
 side = "BOTH"
 

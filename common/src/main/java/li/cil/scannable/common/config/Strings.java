@@ -12,9 +12,11 @@ public final class Strings {
 
     public static final Component TOOLTIP_BLOCKS_LIST_CAPTION = Component.translatable("item.scannable.block_module.list").withStyle(GRAY);
     public static final Component TOOLTIP_ENTITIES_LIST_CAPTION = Component.translatable("item.scannable.entity_module.list").withStyle(GRAY);
+    public static final Component TOOLTIP_SPAWNERS_LIST_CAPTION = Component.translatable("item.scannable.spawner_module.list").withStyle(GRAY);
 
     public static final Component GUI_BLOCKS_LIST_CAPTION = Component.translatable("gui.scannable.block_module.list");
     public static final Component GUI_ENTITIES_LIST_CAPTION = Component.translatable("gui.scannable.entity_module.list");
+    public static final Component GUI_SPAWNERS_LIST_CAPTION = Component.translatable("gui.scannable.spawner_module.list");
 
     public static final Component MESSAGE_NO_SCAN_MODULES = Component.translatable("message.scannable.no_scan_modules").withStyle(RED);
     public static final Component MESSAGE_NOT_ENOUGH_ENERGY = Component.translatable("message.scannable.not_enough_energy").withStyle(RED);

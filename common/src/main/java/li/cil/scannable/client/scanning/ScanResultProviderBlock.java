@@ -15,7 +15,9 @@ import li.cil.scannable.api.scanning.ScanResultRenderContext;
 import li.cil.scannable.api.scanning.ScannerModule;
 import li.cil.scannable.client.ClientConfig;
 import li.cil.scannable.client.shader.Shaders;
+import li.cil.scannable.common.integration.lootr.LootrIntegration;
 import li.cil.scannable.common.item.ScannerModuleItem;
+import li.cil.scannable.common.scanning.ConfigurableSpawnerScannerModule;
 import li.cil.scannable.common.scanning.filter.IgnoredBlocks;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
@@ -32,12 +34,16 @@ import net.minecraft.core.registries.Registries;
 import net.minecraft.network.chat.Component;
 import net.minecraft.tags.TagKey;
 import net.minecraft.util.Mth;
+import net.minecraft.world.entity.Entity;
+import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.BlockGetter;
 import net.minecraft.world.level.ChunkPos;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.Block;
+import net.minecraft.world.level.block.SpawnerBlock;
+import net.minecraft.world.level.block.entity.SpawnerBlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.chunk.ChunkAccess;
 import net.minecraft.world.level.chunk.status.ChunkStatus;
@@ -63,6 +69,10 @@ public final class ScanResultProviderBlock extends AbstractScanResultProvider {
     // really only need this when scanning for stupid stuff like stone.
     private static final int MAX_RESULTS_PER_BLOCK = 8192;
     private static final int DEFAULT_COLOR = 0x4466CC;
+    // Above this cell count we don't do the live hide-broken / Lootr-looted world re-check (it would
+    // mean a getBlockState per cell on big clusters, e.g. a block module on stone) - those just keep
+    // their static highlight.
+    private static final int MAX_LIVE_CELLS = 4096;
 
     private final List<ScanFilterLayer> scanFilterLayers = new ArrayList<>();
     private final List<ChunkSectionPos> pendingChunkSections = new ArrayList<>();
@@ -72,6 +82,12 @@ public final class ScanResultProviderBlock extends AbstractScanResultProvider {
 
     private long renderStartTime;
 
+    // Spawner mob narrowing, gathered from configurable spawner modules. matchAll = an unconfigured
+    // spawner module is present (highlight every spawner); otherwise only spawners whose mob is in
+    // mobFilter pass.
+    private boolean spawnerMatchAll;
+    private final Set<EntityType<?>> spawnerMobFilter = new HashSet<>();
+
     // --------------------------------------------------------------------- //
     // ScanResultProvider
 
@@ -80,6 +96,8 @@ public final class ScanResultProviderBlock extends AbstractScanResultProvider {
         super.initialize(player, modules, center, radius, scanTicks);
 
         scanFilterLayers.clear();
+        spawnerMatchAll = false;
+        spawnerMobFilter.clear();
 
         final IntObjectMap<List<Predicate<BlockState>>> filterByRadius = new IntObjectHashMap<>();
         for (final ItemStack stack : modules) {
@@ -89,6 +107,14 @@ public final class ScanResultProviderBlock extends AbstractScanResultProvider {
                     final Predicate<BlockState> filter = blockModule.getFilter(stack);
                     final int localRadius = (int) Math.ceil(blockModule.adjustLocalRange(this.radius));
                     filterByRadius.computeIfAbsent(localRadius, r -> new ArrayList<>()).add(filter);
+                }
+                if (module instanceof final ConfigurableSpawnerScannerModule spawnerModule) {
+                    final List<EntityType<?>> types = spawnerModule.getEntityTypes(stack);
+                    if (types.isEmpty()) {
+                        spawnerMatchAll = true; // unconfigured -> all spawners
+                    } else {
+                        spawnerMobFilter.addAll(types);
+                    }
                 }
             });
         }
@@ -225,6 +251,14 @@ public final class ScanResultProviderBlock extends AbstractScanResultProvider {
         for (final BlockScanResult result : results) {
             if (result.isRoot()) {
                 result.bake(level);
+
+                // Spawner mob narrowing: when a mob filter is active, drop spawners that don't spawn a
+                // configured mob (including empty spawners). Non-spawner results are unaffected.
+                if (result.block instanceof SpawnerBlock && !spawnerMatchAll && !spawnerMobFilter.isEmpty()
+                    && (result.spawnerType == null || !spawnerMobFilter.contains(result.spawnerType))) {
+                    continue;
+                }
+
                 callback.accept(result);
             }
         }
@@ -291,11 +325,27 @@ public final class ScanResultProviderBlock extends AbstractScanResultProvider {
 
         shader.safeGetUniform("time").set((System.currentTimeMillis() - renderStartTime) / 1000.0f);
 
+        // Live hide-broken-blocks / Lootr-looted update: prune cells that no longer match and rebuild
+        // the affected VBOs. Done before setting up the render state since it uses the Tesselator.
+        final Level level = Minecraft.getInstance().level;
+        final Player viewer = Minecraft.getInstance().player;
+        if (level != null) {
+            for (final ScanResult result : results) {
+                final BlockScanResult blockResult = (BlockScanResult) result;
+                if (blockResult.needsLiveRefresh()) {
+                    blockResult.refreshVisible(level, viewer);
+                }
+            }
+        }
+
         final RenderType renderType = getBlockScanResultRenderLayer();
         renderType.setupRenderState();
         for (final ScanResult result : results) {
             final BlockScanResult blockResult = (BlockScanResult) result;
             final VertexBuffer vbo = blockResult.vbo;
+            if (vbo == null) {
+                continue; // Fully pruned (all cells mined / looted).
+            }
             vbo.bind();
             vbo.drawWithShader(poseStack.last().pose(), RenderSystem.getProjectionMatrix(), shader);
             VertexBuffer.unbind();
@@ -322,12 +372,17 @@ public final class ScanResultProviderBlock extends AbstractScanResultProvider {
         for (final ScanResult result : results) {
             final BlockScanResult blockResult = (BlockScanResult) result;
 
+            // Don't label a cluster that's been fully mined / looted since the scan.
+            if (!blockResult.hasVisible()) {
+                continue;
+            }
+
             final Vec3 resultPos = result.getPosition();
             final Vec3 toResult = resultPos.subtract(viewerEyes);
             final float lookDirDot = (float) lookVec.dot(toResult.normalize());
 
             final Block block = blockResult.block;
-            final Component label = block.getName();
+            final Component label = blockResult.label != null ? blockResult.label : block.getName();
             if (lookDirDot > 0.98f && !Strings.isNullOrEmpty(label.getString())) {
                 final float distance = showDistance ? (float) resultPos.subtract(viewerEyes).length() : 0f;
                 renderIconLabel(bufferSource, poseStack, yaw, pitch, lookVec, viewerEyes, distance, resultPos, API.ICON_INFO, label);
@@ -379,6 +434,16 @@ public final class ScanResultProviderBlock extends AbstractScanResultProvider {
         private final Set<BlockPos> blocks;
         private int color;
         private VertexBuffer vbo;
+        // Cells currently represented by the VBO. Equals `blocks` unless the live hide-broken-blocks
+        // (or Lootr looted) check has pruned some; null until baked.
+        @Nullable private Set<BlockPos> visibleBlocks;
+        private long lastVisibleCheck;
+        // Overrides the generic block name in the looking-at label (e.g. "Zombie Spawner").
+        @Nullable private Component label;
+        // The mob this result's spawner spawns (null otherwise); drives the spawner mob filter.
+        @Nullable private EntityType<?> spawnerType;
+        // This result is a Lootr loot container: gold highlight + live looted-hide.
+        private boolean lootr;
 
         BlockScanResult(final Block block, final BlockPos pos) {
             this.block = block;
@@ -421,12 +486,98 @@ public final class ScanResultProviderBlock extends AbstractScanResultProvider {
                 color = DEFAULT_COLOR;
             }
 
+            // Lootr loot containers: force the gold highlight + flag them for the live looted-hide.
+            // Tag-only detection, so this is a no-op on packs without Lootr.
+            if (LootrIntegration.isContainer(blockState)) {
+                lootr = true;
+                color = LootrIntegration.GOLD;
+            }
+
+            // Spawners: label with the mob they spawn ("Zombie Spawner") instead of the generic block
+            // name, and record the type for the spawner mob filter. An empty/un-set spawner leaves the
+            // label null (keeps the generic "Monster Spawner").
+            if (block instanceof SpawnerBlock && level instanceof final Level realLevel) {
+                for (final BlockPos pos : blocks) {
+                    if (realLevel.getBlockEntity(pos) instanceof final SpawnerBlockEntity spawner) {
+                        final Entity display = spawner.getSpawner().getOrCreateDisplayEntity(realLevel, pos);
+                        if (display != null) {
+                            spawnerType = display.getType();
+                            label = Component.translatable("gui.scannable.overlay.spawner", display.getType().getDescription());
+                        }
+                        break;
+                    }
+                }
+            }
+
+            visibleBlocks = blocks;
+            buildVbo();
+        }
+
+        private void buildVbo() {
+            if (visibleBlocks == null || visibleBlocks.isEmpty()) {
+                return;
+            }
             final BufferBuilder buffer = Tesselator.getInstance().begin(VertexFormat.Mode.QUADS, DefaultVertexFormat.POSITION_TEX_COLOR);
             render(buffer, new PoseStack());
-            vbo = new VertexBuffer(VertexBuffer.Usage.STATIC);
+            if (vbo == null) {
+                vbo = new VertexBuffer(VertexBuffer.Usage.STATIC);
+            }
             vbo.bind();
             vbo.upload(buffer.buildOrThrow());
             VertexBuffer.unbind();
+        }
+
+        // Recompute which cells are still present (hide-broken-blocks) and, for Lootr containers, not
+        // yet looted by this player; rebuild the VBO if that set changed. Throttled to ~10x/s and
+        // skipped for very large clusters to bound per-cell world lookups. A fully-pruned cluster
+        // drops its VBO (and is skipped when rendering).
+        void refreshVisible(final Level level, @Nullable final Player viewer) {
+            if (blocks.size() > MAX_LIVE_CELLS) {
+                return;
+            }
+            final long now = System.currentTimeMillis();
+            if (now - lastVisibleCheck < 100L) {
+                return;
+            }
+            lastVisibleCheck = now;
+
+            final Set<BlockPos> present = new HashSet<>();
+            for (final BlockPos cell : blocks) {
+                if (cellPresent(level, viewer, cell)) {
+                    present.add(cell);
+                }
+            }
+            if (present.equals(visibleBlocks)) {
+                return;
+            }
+            visibleBlocks = present;
+            if (present.isEmpty()) {
+                if (vbo != null) {
+                    vbo.close();
+                    vbo = null;
+                }
+            } else {
+                buildVbo();
+            }
+        }
+
+        private boolean cellPresent(final Level level, @Nullable final Player viewer, final BlockPos cell) {
+            if (!level.hasChunkAt(cell)) {
+                return true; // Unloaded -> unknown, assume present.
+            }
+            if (lootr) {
+                return LootrIntegration.isContainer(level.getBlockState(cell))
+                    && !LootrIntegration.isClientLooted(level, cell, viewer);
+            }
+            return level.getBlockState(cell).is(block);
+        }
+
+        boolean needsLiveRefresh() {
+            return lootr || ClientConfig.hideBrokenBlocks;
+        }
+
+        boolean hasVisible() {
+            return visibleBlocks == null || !visibleBlocks.isEmpty();
         }
 
         boolean isRoot() {
@@ -470,8 +621,9 @@ public final class ScanResultProviderBlock extends AbstractScanResultProvider {
             final float sizeUvX = (float) (1.0 / bounds.getXsize());
             final float sizeUvY = (float) (1.0 / bounds.getYsize());
             final float sizeUvZ = (float) (1.0 / bounds.getZsize());
-            for (final BlockPos cell : blocks) {
-                if (!blocks.contains(cell.offset(-1, 0, 0))) {
+            final Set<BlockPos> cells = visibleBlocks != null ? visibleBlocks : blocks;
+            for (final BlockPos cell : cells) {
+                if (!cells.contains(cell.offset(-1, 0, 0))) {
                     final float x = cell.getX();
                     final float minY = cell.getY();
                     final float maxY = cell.getY() + 1;
@@ -486,7 +638,7 @@ public final class ScanResultProviderBlock extends AbstractScanResultProvider {
                     buffer.addVertex(matrix, x, maxY, maxZ).setUv(u1, v1).setColor(r, g, b, 0.8f);
                     buffer.addVertex(matrix, x, maxY, minZ).setUv(u1, v0).setColor(r, g, b, 0.8f);
                 }
-                if (!blocks.contains(cell.offset(1, 0, 0))) {
+                if (!cells.contains(cell.offset(1, 0, 0))) {
                     final float x = cell.getX() + 1;
                     final float minY = cell.getY();
                     final float maxY = cell.getY() + 1;
@@ -501,7 +653,7 @@ public final class ScanResultProviderBlock extends AbstractScanResultProvider {
                     buffer.addVertex(matrix, x, maxY, maxZ).setUv(u1, v1).setColor(r, g, b, 0.8f);
                     buffer.addVertex(matrix, x, minY, maxZ).setUv(u0, v1).setColor(r, g, b, 0.8f);
                 }
-                if (!blocks.contains(cell.offset(0, -1, 0))) {
+                if (!cells.contains(cell.offset(0, -1, 0))) {
                     final float y = cell.getY();
                     final float minX = cell.getX();
                     final float maxX = cell.getX() + 1;
@@ -516,7 +668,7 @@ public final class ScanResultProviderBlock extends AbstractScanResultProvider {
                     buffer.addVertex(matrix, maxX, y, maxZ).setUv(u1, v1).setColor(r, g, b, 0.7f);
                     buffer.addVertex(matrix, minX, y, maxZ).setUv(u0, v1).setColor(r, g, b, 0.7f);
                 }
-                if (!blocks.contains(cell.offset(0, 1, 0))) {
+                if (!cells.contains(cell.offset(0, 1, 0))) {
                     final float y = cell.getY() + 1;
                     final float minX = cell.getX();
                     final float maxX = cell.getX() + 1;
@@ -531,7 +683,7 @@ public final class ScanResultProviderBlock extends AbstractScanResultProvider {
                     buffer.addVertex(matrix, maxX, y, maxZ).setUv(u1, v1).setColor(r, g, b, 1.0f);
                     buffer.addVertex(matrix, maxX, y, minZ).setUv(u1, v0).setColor(r, g, b, 1.0f);
                 }
-                if (!blocks.contains(cell.offset(0, 0, -1))) {
+                if (!cells.contains(cell.offset(0, 0, -1))) {
                     final float z = cell.getZ();
                     final float minX = cell.getX();
                     final float maxX = cell.getX() + 1;
@@ -546,7 +698,7 @@ public final class ScanResultProviderBlock extends AbstractScanResultProvider {
                     buffer.addVertex(matrix, maxX, maxY, z).setUv(u1, v1).setColor(r, g, b, 0.9f);
                     buffer.addVertex(matrix, maxX, minY, z).setUv(u1, v0).setColor(r, g, b, 0.9f);
                 }
-                if (!blocks.contains(cell.offset(0, 0, 1))) {
+                if (!cells.contains(cell.offset(0, 0, 1))) {
                     final float z = cell.getZ() + 1;
                     final float minX = cell.getX();
                     final float maxX = cell.getX() + 1;
