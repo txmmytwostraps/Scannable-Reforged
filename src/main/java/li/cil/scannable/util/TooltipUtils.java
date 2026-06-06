@@ -3,7 +3,6 @@ package li.cil.scannable.util;
 import net.minecraft.ChatFormatting;
 import net.minecraft.locale.Language;
 import net.minecraft.network.chat.Component;
-import net.minecraft.network.chat.MutableComponent;
 import net.minecraft.world.item.ItemStack;
 
 import java.util.function.Consumer;
@@ -16,9 +15,14 @@ public final class TooltipUtils {
 
         final String translationKey = stack.getItem().getDescriptionId() + ".desc";
         final Language language = Language.getInstance();
-        if (language.has(translationKey)) {
-            final MutableComponent description = Component.translatable(translationKey);
-            tooltip.accept(description.withStyle(ChatFormatting.DARK_GRAY));
+        if (!language.has(translationKey)) {
+            return;
+        }
+
+        // Emit one tooltip line per newline. A single translated component with '\n' does NOT
+        // hard-break in 26.1's tooltip wrapping (it reflows as one paragraph), so split explicitly.
+        for (final String line : Component.translatable(translationKey).getString().split("\n")) {
+            tooltip.accept(Component.literal(line).withStyle(ChatFormatting.DARK_GRAY));
         }
     }
 }
