@@ -39,6 +39,7 @@ import net.minecraft.world.level.material.FluidState;
 import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.Vec3;
 import net.minecraft.world.phys.shapes.Shapes;
+import net.minecraft.world.phys.shapes.VoxelShape;
 
 import javax.annotation.Nullable;
 import java.util.*;
@@ -51,6 +52,9 @@ public final class ScanResultProviderBlock extends AbstractScanResultProvider {
     // really only need this when scanning for stupid stuff like stone.
     private static final int MAX_RESULTS_PER_BLOCK = 8192;
     private static final int DEFAULT_COLOR = 0x4466CC;
+    // Above this cell count a cluster is highlighted as its bounding box rather than its per-cell
+    // surface, to bound the per-frame geometry + shape-build cost (e.g. a block module on stone).
+    private static final int MAX_CONTOUR_CELLS = 256;
 
     private final List<ScanFilterLayer> scanFilterLayers = new ArrayList<>();
     private final List<ChunkSectionPos> pendingChunkSections = new ArrayList<>();
@@ -224,26 +228,27 @@ public final class ScanResultProviderBlock extends AbstractScanResultProvider {
 
         final PoseStack.Pose pose = poseStack.last();
 
-        // Pass 1: subtle translucent fill (inflated slightly so it floats outside the block faces,
-        // keeping the ore visible through it).
+        // Pass 1: subtle translucent fill, contouring the actual ore cells (a single ore is one box).
         final VertexConsumer fill = bufferSource.getBuffer(ScanResultRenderType.TYPE);
         for (final ScanResult result : results) {
-            final AABB bounds = result.getRenderBounds();
-            if (bounds == null) {
-                continue;
+            final BlockScanResult br = (BlockScanResult) result;
+            final int c = br.color;
+            final float r = ((c >> 16) & 0xFF) / 255.0f, g = ((c >> 8) & 0xFF) / 255.0f, b = (c & 0xFF) / 255.0f;
+            if (br.blocks.size() <= MAX_CONTOUR_CELLS) {
+                addClusterFill(fill, pose, br.blocks, r, g, b, 0.28f);
+            } else {
+                addBox(fill, pose, br.bounds, r, g, b, 0.28f);
             }
-            final int c = ((BlockScanResult) result).color;
-            addBox(fill, pose, bounds.inflate(0.01), ((c >> 16) & 0xFF) / 255.0f, ((c >> 8) & 0xFF) / 255.0f, (c & 0xFF) / 255.0f, 0.28f);
         }
 
-        // Pass 2: bright edges on top of the fill for definition.
+        // Pass 2: bright edges outlining the cluster contour.
         final VertexConsumer edges = bufferSource.getBuffer(ScanResultRenderType.LINES_TYPE);
         for (final ScanResult result : results) {
-            final AABB bounds = result.getRenderBounds();
-            if (bounds == null) {
+            final BlockScanResult br = (BlockScanResult) result;
+            if (br.shape == null) {
                 continue;
             }
-            ShapeRenderer.renderShape(poseStack, edges, Shapes.create(bounds.inflate(0.01)), 0.0, 0.0, 0.0, 0xFF000000 | ((BlockScanResult) result).color, 2.0f);
+            ShapeRenderer.renderShape(poseStack, edges, br.shape, br.bounds.minX, br.bounds.minY, br.bounds.minZ, 0xFF000000 | br.color, 2.0f);
         }
     }
 
@@ -275,6 +280,30 @@ public final class ScanResultProviderBlock extends AbstractScanResultProvider {
         buffer.addVertex(pose, x1, y0, z1).setColor(r, g, b, a);
         buffer.addVertex(pose, x1, y1, z1).setColor(r, g, b, a);
         buffer.addVertex(pose, x0, y1, z1).setColor(r, g, b, a);
+    }
+
+    private static void addClusterFill(final VertexConsumer buffer, final PoseStack.Pose pose, final Set<BlockPos> cells, final float r, final float g, final float b, final float a) {
+        for (final BlockPos cell : cells) {
+            final float x0 = cell.getX(), y0 = cell.getY(), z0 = cell.getZ();
+            final float x1 = x0 + 1.0f, y1 = y0 + 1.0f, z1 = z0 + 1.0f;
+            // Only emit faces on the outside of the cluster (neighbour cell not part of it).
+            if (!cells.contains(cell.west()))  quad(buffer, pose, x0, y0, z0, x0, y0, z1, x0, y1, z1, x0, y1, z0, r, g, b, a);
+            if (!cells.contains(cell.east()))  quad(buffer, pose, x1, y0, z1, x1, y0, z0, x1, y1, z0, x1, y1, z1, r, g, b, a);
+            if (!cells.contains(cell.below())) quad(buffer, pose, x0, y0, z0, x1, y0, z0, x1, y0, z1, x0, y0, z1, r, g, b, a);
+            if (!cells.contains(cell.above())) quad(buffer, pose, x0, y1, z1, x1, y1, z1, x1, y1, z0, x0, y1, z0, r, g, b, a);
+            if (!cells.contains(cell.north())) quad(buffer, pose, x1, y0, z0, x0, y0, z0, x0, y1, z0, x1, y1, z0, r, g, b, a);
+            if (!cells.contains(cell.south())) quad(buffer, pose, x0, y0, z1, x1, y0, z1, x1, y1, z1, x0, y1, z1, r, g, b, a);
+        }
+    }
+
+    private static void quad(final VertexConsumer buffer, final PoseStack.Pose pose,
+                             final float ax, final float ay, final float az, final float bx, final float by, final float bz,
+                             final float cx, final float cy, final float cz, final float dx, final float dy, final float dz,
+                             final float r, final float g, final float b, final float a) {
+        buffer.addVertex(pose, ax, ay, az).setColor(r, g, b, a);
+        buffer.addVertex(pose, bx, by, bz).setColor(r, g, b, a);
+        buffer.addVertex(pose, cx, cy, cz).setColor(r, g, b, a);
+        buffer.addVertex(pose, dx, dy, dz).setColor(r, g, b, a);
     }
 
     @Override
@@ -332,6 +361,7 @@ public final class ScanResultProviderBlock extends AbstractScanResultProvider {
         @Nullable private BlockScanResult parent;
         private final Set<BlockPos> blocks;
         private int color;
+        @Nullable private VoxelShape shape;
 
         BlockScanResult(final Block block, final BlockPos pos) {
             this.block = block;
@@ -374,8 +404,22 @@ public final class ScanResultProviderBlock extends AbstractScanResultProvider {
                 color = DEFAULT_COLOR;
             }
 
-            // TODO(Phase 3b): bake the cluster geometry into a render buffer. The 1.21.1 path built a
-            // VertexBuffer here; VertexBuffer / Tesselator immediate mode were removed in 1.21.6.
+            // Build the edge-outline shape relative to the bounds min (keeps VoxelShape coords
+            // small). Small clusters contour the real cells; huge ones fall back to the bounding box.
+            final int ox = (int) Math.floor(bounds.minX);
+            final int oy = (int) Math.floor(bounds.minY);
+            final int oz = (int) Math.floor(bounds.minZ);
+            if (blocks.size() <= MAX_CONTOUR_CELLS) {
+                VoxelShape s = Shapes.empty();
+                for (final BlockPos cell : blocks) {
+                    s = Shapes.or(s, Shapes.box(
+                        cell.getX() - ox, cell.getY() - oy, cell.getZ() - oz,
+                        cell.getX() - ox + 1, cell.getY() - oy + 1, cell.getZ() - oz + 1));
+                }
+                shape = s;
+            } else {
+                shape = Shapes.create(bounds.move(-ox, -oy, -oz));
+            }
         }
 
         boolean isRoot() {
