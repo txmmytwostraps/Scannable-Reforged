@@ -62,7 +62,7 @@ public final class ScanResultRenderType {
     // the fragment reads GameTime from the auto-bound Globals UBO, so it renders through the normal
     // buffered path (no manual pass needed).
     public static final RenderPipeline SHIMMER_PIPELINE = RenderPipeline.builder()
-        .withLocation(Identifier.fromNamespaceAndPath(API.MOD_ID, "pipeline/scan_result"))
+        .withLocation(Identifier.fromNamespaceAndPath(API.MOD_ID, "pipeline/scan_shimmer"))
         .withVertexShader("core/position_tex_color")
         .withFragmentShader(Identifier.fromNamespaceAndPath(API.MOD_ID, "core/scan_result"))
         .withUniform("Projection", UniformType.UNIFORM_BUFFER)
@@ -74,7 +74,7 @@ public final class ScanResultRenderType {
         .withVertexFormat(DefaultVertexFormat.POSITION_TEX_COLOR, VertexFormat.Mode.QUADS)
         .build();
 
-    public static final RenderType SHIMMER_TYPE = RenderType.create(API.MOD_ID + ":scan_result", RenderSetup.builder(SHIMMER_PIPELINE).createRenderSetup());
+    public static final RenderType SHIMMER_TYPE = RenderType.create(API.MOD_ID + ":scan_shimmer", RenderSetup.builder(SHIMMER_PIPELINE).createRenderSetup());
 
     // Fullscreen scan-reveal effect: samples the main depth buffer and additively paints the
     // expanding spherical wave. No vertex buffer (core/screenquad generates the fullscreen triangle
