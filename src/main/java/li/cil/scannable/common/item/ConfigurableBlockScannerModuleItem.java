@@ -128,8 +128,8 @@ public final class ConfigurableBlockScannerModuleItem extends ScannerModuleItem 
 
     // --------------------------------------------------------------------- //
 
-    public ConfigurableBlockScannerModuleItem() {
-        super(ConfigurableBlockScannerModule.INSTANCE);
+    public ConfigurableBlockScannerModuleItem(final Properties properties) {
+        super(ConfigurableBlockScannerModule.INSTANCE, properties);
     }
 
     // --------------------------------------------------------------------- //

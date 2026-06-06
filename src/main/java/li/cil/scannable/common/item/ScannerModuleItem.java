@@ -22,8 +22,8 @@ public class ScannerModuleItem extends ModItem {
 
     // --------------------------------------------------------------------- //
 
-    ScannerModuleItem(final ScannerModule module) {
-        super(new Item.Properties().stacksTo(1));
+    ScannerModuleItem(final ScannerModule module, final Item.Properties properties) {
+        super(properties.stacksTo(1));
         this.module = module;
     }
 

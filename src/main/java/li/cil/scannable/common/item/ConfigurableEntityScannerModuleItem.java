@@ -126,8 +126,8 @@ public final class ConfigurableEntityScannerModuleItem extends ScannerModuleItem
 
     // --------------------------------------------------------------------- //
 
-    public ConfigurableEntityScannerModuleItem() {
-        super(ConfigurableEntityScannerModule.INSTANCE);
+    public ConfigurableEntityScannerModuleItem(final Properties properties) {
+        super(ConfigurableEntityScannerModule.INSTANCE, properties);
     }
 
     // --------------------------------------------------------------------- //

@@ -17,10 +17,6 @@ public class ModItem extends Item {
         super(properties);
     }
 
-    protected ModItem() {
-        this(new Properties());
-    }
-
     // --------------------------------------------------------------------- //
 
     @OnlyIn(Dist.CLIENT)

@@ -37,8 +37,8 @@ public final class ScannerItem extends ModItem {
 
     // --------------------------------------------------------------------- //
 
-    public ScannerItem() {
-        super(new Properties().stacksTo(1));
+    public ScannerItem(final Properties properties) {
+        super(properties.stacksTo(1));
     }
 
     // --------------------------------------------------------------------- //
