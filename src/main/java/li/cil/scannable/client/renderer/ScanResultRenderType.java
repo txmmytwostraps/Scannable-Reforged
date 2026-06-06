@@ -1,8 +1,13 @@
 package li.cil.scannable.client.renderer;
 
+import com.mojang.blaze3d.pipeline.ColorTargetState;
+import com.mojang.blaze3d.pipeline.BlendFunction;
 import com.mojang.blaze3d.pipeline.DepthStencilState;
 import com.mojang.blaze3d.pipeline.RenderPipeline;
 import com.mojang.blaze3d.platform.CompareOp;
+import com.mojang.blaze3d.shaders.UniformType;
+import com.mojang.blaze3d.vertex.DefaultVertexFormat;
+import com.mojang.blaze3d.vertex.VertexFormat;
 import li.cil.scannable.api.API;
 import net.minecraft.client.renderer.RenderPipelines;
 import net.minecraft.client.renderer.rendertype.RenderSetup;
@@ -49,6 +54,23 @@ public final class ScanResultRenderType {
             API.MOD_ID + ":scan_icon/" + tex,
             RenderSetup.builder(ICON_PIPELINE).withTexture("Sampler0", tex).createRenderSetup()));
     }
+
+    // Fullscreen scan-reveal effect: samples the main depth buffer and additively paints the
+    // expanding spherical wave. No vertex buffer (core/screenquad generates the fullscreen triangle
+    // from gl_VertexID); no depth test/write; additive blend. Drawn via a manual RenderPass in
+    // ScannerRenderer so it can bind the depth texture + a per-frame uniform buffer.
+    public static final RenderPipeline SCAN_EFFECT_PIPELINE = RenderPipeline.builder()
+        .withLocation(Identifier.fromNamespaceAndPath(API.MOD_ID, "pipeline/scan_effect"))
+        .withVertexShader("core/screenquad")
+        .withFragmentShader(Identifier.fromNamespaceAndPath(API.MOD_ID, "core/scan_effect"))
+        .withSampler("DepthSampler")
+        .withUniform("Projection", UniformType.UNIFORM_BUFFER)
+        .withUniform("ScanInfo", UniformType.UNIFORM_BUFFER)
+        .withColorTargetState(new ColorTargetState(BlendFunction.ADDITIVE))
+        .withDepthStencilState(new DepthStencilState(CompareOp.ALWAYS_PASS, false))
+        .withCull(false)
+        .withVertexFormat(DefaultVertexFormat.EMPTY, VertexFormat.Mode.TRIANGLES)
+        .build();
 
     private ScanResultRenderType() {
     }

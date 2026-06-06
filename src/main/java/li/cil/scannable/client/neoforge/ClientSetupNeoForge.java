@@ -7,6 +7,7 @@ import li.cil.scannable.client.gui.ConfigurableBlockScannerModuleContainerScreen
 import li.cil.scannable.client.gui.ConfigurableEntityScannerModuleContainerScreen;
 import li.cil.scannable.client.gui.ScannerContainerScreen;
 import li.cil.scannable.client.renderer.ScanResultRenderType;
+import li.cil.scannable.client.renderer.ScannerRenderer;
 import li.cil.scannable.common.container.Containers;
 import net.minecraft.client.Minecraft;
 import net.neoforged.api.distmarker.Dist;
@@ -35,6 +36,9 @@ public final class ClientSetupNeoForge {
     public static void handleRenderLevel(final RenderLevelStageEvent.AfterTranslucentBlocks event) {
         final float partialTick = Minecraft.getInstance().getDeltaTracker().getGameTimeDeltaPartialTick(false);
         ScanManager.renderLevel(event.getPoseStack(), partialTick);
+        // The scan-reveal wave is a separate fullscreen pass (depth-buffer reconstruction); it plays
+        // for the ping duration regardless of how many results are currently shown.
+        ScannerRenderer.INSTANCE.render(event.getModelViewMatrix());
     }
 
     @SubscribeEvent
@@ -42,6 +46,7 @@ public final class ClientSetupNeoForge {
         event.registerPipeline(ScanResultRenderType.PIPELINE);
         event.registerPipeline(ScanResultRenderType.LINES_PIPELINE);
         event.registerPipeline(ScanResultRenderType.ICON_PIPELINE);
+        event.registerPipeline(ScanResultRenderType.SCAN_EFFECT_PIPELINE);
     }
 
     @SubscribeEvent
