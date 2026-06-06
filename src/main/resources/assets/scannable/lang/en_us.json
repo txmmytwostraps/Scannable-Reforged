@@ -16,7 +16,7 @@
   "item.scannable.rare_ores_module": "Scanner Module: Rare Ores",
   "item.scannable.rare_ores_module.desc": "Detects rare ores (e.g. diamond, emerald).",
   "item.scannable.block_module": "Scanner Module: Block",
-  "item.scannable.block_module.desc": "Detects configured blocks. Use on a block to add it to the configuration. Use on air to manage configuration.",
+  "item.scannable.block_module.desc": "Detects chosen blocks.\nRight-click a block to add it.\nRight-click air to configure, or use blocks.",
   "item.scannable.block_module.list": "Configured blocks:",
   "item.scannable.fluid_module": "Scanner Module: Fluids",
   "item.scannable.fluid_module.desc": "Detects fluids (e.g. water, lava).",
