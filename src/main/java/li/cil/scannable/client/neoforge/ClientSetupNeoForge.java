@@ -10,6 +10,7 @@ import li.cil.scannable.client.gui.ScannerContainerScreen;
 import li.cil.scannable.client.renderer.OverlayRenderer;
 import li.cil.scannable.client.renderer.ScanResultRenderType;
 import li.cil.scannable.client.renderer.ScannerRenderer;
+import com.mojang.blaze3d.vertex.PoseStack;
 import li.cil.scannable.common.container.Containers;
 import net.minecraft.client.Minecraft;
 import net.neoforged.api.distmarker.Dist;
@@ -34,12 +35,16 @@ public final class ClientSetupNeoForge {
         NeoForge.EVENT_BUS.addListener(ClientSetupNeoForge::handleRenderLevel);
     }
 
-    // 26.1 RenderLevelStageEvent is split into per-stage subclasses; AfterTranslucentBlocks provides
-    // a non-null pose and renders after translucent terrain (good for the scan result boxes).
-    // TODO(Phase 3c): re-add the fullscreen scan-effect + GUI overlay (OverlayRenderer / result GUI).
-    public static void handleRenderLevel(final RenderLevelStageEvent.AfterTranslucentBlocks event) {
+    // Render the scan overlays in AfterLevel — i.e. AFTER the whole level, including the shader
+    // composite under Iris/Oculus — so they draw on top of the final frame and stay visible with
+    // shaders (this is what the 1.21.1 line does via AFTER_LEVEL; rendering mid-level in an earlier
+    // stage gets discarded by the shader pipeline). getPoseStack() is null here, so build the pose
+    // from the camera modelview matrix.
+    public static void handleRenderLevel(final RenderLevelStageEvent.AfterLevel event) {
         final float partialTick = Minecraft.getInstance().getDeltaTracker().getGameTimeDeltaPartialTick(false);
-        ScanManager.renderLevel(event.getPoseStack(), partialTick);
+        final PoseStack poseStack = new PoseStack();
+        poseStack.last().pose().set(event.getModelViewMatrix());
+        ScanManager.renderLevel(poseStack, partialTick);
         // The scan-reveal wave is a separate fullscreen pass (depth-buffer reconstruction); it plays
         // for the ping duration regardless of how many results are currently shown.
         ScannerRenderer.INSTANCE.render(event.getModelViewMatrix());
