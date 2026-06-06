@@ -17,6 +17,7 @@ import com.mojang.blaze3d.vertex.VertexConsumer;
 import li.cil.scannable.client.renderer.ScanResultRenderType;
 import net.minecraft.client.Camera;
 import net.minecraft.client.renderer.MultiBufferSource;
+import net.minecraft.client.renderer.ShapeRenderer;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.SectionPos;
 import net.minecraft.core.registries.BuiltInRegistries;
@@ -37,6 +38,7 @@ import net.minecraft.world.level.chunk.PalettedContainer;
 import net.minecraft.world.level.material.FluidState;
 import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.Vec3;
+import net.minecraft.world.phys.shapes.Shapes;
 
 import javax.annotation.Nullable;
 import java.util.*;
@@ -220,18 +222,28 @@ public final class ScanResultProviderBlock extends AbstractScanResultProvider {
             return;
         }
 
-        // Filled, translucent, through-wall boxes around each result cluster.
-        final VertexConsumer buffer = bufferSource.getBuffer(ScanResultRenderType.TYPE);
         final PoseStack.Pose pose = poseStack.last();
+
+        // Pass 1: subtle translucent fill (inflated slightly so it floats outside the block faces,
+        // keeping the ore visible through it).
+        final VertexConsumer fill = bufferSource.getBuffer(ScanResultRenderType.TYPE);
         for (final ScanResult result : results) {
             final AABB bounds = result.getRenderBounds();
             if (bounds == null) {
                 continue;
             }
             final int c = ((BlockScanResult) result).color;
-            // Inflate slightly so the highlight floats just outside the block faces (avoids the
-            // coplanar look) and keep the fill subtle so the ore stays visible through it.
-            addBox(buffer, pose, bounds.inflate(0.01), ((c >> 16) & 0xFF) / 255.0f, ((c >> 8) & 0xFF) / 255.0f, (c & 0xFF) / 255.0f, 0.28f);
+            addBox(fill, pose, bounds.inflate(0.01), ((c >> 16) & 0xFF) / 255.0f, ((c >> 8) & 0xFF) / 255.0f, (c & 0xFF) / 255.0f, 0.28f);
+        }
+
+        // Pass 2: bright edges on top of the fill for definition.
+        final VertexConsumer edges = bufferSource.getBuffer(ScanResultRenderType.LINES_TYPE);
+        for (final ScanResult result : results) {
+            final AABB bounds = result.getRenderBounds();
+            if (bounds == null) {
+                continue;
+            }
+            ShapeRenderer.renderShape(poseStack, edges, Shapes.create(bounds.inflate(0.01)), 0.0, 0.0, 0.0, 0xFF000000 | ((BlockScanResult) result).color, 2.0f);
         }
     }
 

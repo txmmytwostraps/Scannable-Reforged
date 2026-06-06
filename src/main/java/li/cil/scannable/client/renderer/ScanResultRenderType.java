@@ -23,6 +23,14 @@ public final class ScanResultRenderType {
 
     public static final RenderType TYPE = RenderType.create(API.MOD_ID + ":scan_result", RenderSetup.builder(PIPELINE).createRenderSetup());
 
+    // Matching no-depth line pipeline/type for the box edges (a bright outline on top of the fill).
+    public static final RenderPipeline LINES_PIPELINE = RenderPipeline.builder(RenderPipelines.LINES_SNIPPET)
+        .withLocation(Identifier.fromNamespaceAndPath(API.MOD_ID, "pipeline/scan_result_lines"))
+        .withDepthStencilState(new DepthStencilState(CompareOp.ALWAYS_PASS, false))
+        .build();
+
+    public static final RenderType LINES_TYPE = RenderType.create(API.MOD_ID + ":scan_result_lines", RenderSetup.builder(LINES_PIPELINE).createRenderSetup());
+
     private ScanResultRenderType() {
     }
 }
