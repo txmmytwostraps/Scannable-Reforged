@@ -5,8 +5,6 @@ import li.cil.scannable.common.container.BlockModuleContainerMenu;
 import li.cil.scannable.common.item.ConfigurableBlockScannerModuleItem;
 import li.cil.scannable.common.network.Network;
 import li.cil.scannable.common.network.message.SetConfiguredModuleItemAtMessage;
-import net.neoforged.api.distmarker.Dist;
-import net.neoforged.api.distmarker.OnlyIn;
 import net.minecraft.client.gui.GuiGraphicsExtractor;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.network.chat.Component;
@@ -17,7 +15,6 @@ import net.minecraft.world.level.block.Blocks;
 
 import java.util.List;
 
-@OnlyIn(Dist.CLIENT)
 public class ConfigurableBlockScannerModuleContainerScreen extends AbstractConfigurableScannerModuleContainerScreen<BlockModuleContainerMenu, Block> {
     public ConfigurableBlockScannerModuleContainerScreen(final BlockModuleContainerMenu container, final Inventory inventory, final Component title) {
         super(container, inventory, title, Strings.GUI_BLOCKS_LIST_CAPTION);

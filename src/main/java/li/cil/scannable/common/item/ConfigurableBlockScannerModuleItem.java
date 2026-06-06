@@ -5,8 +5,6 @@ import li.cil.scannable.common.config.Strings;
 import li.cil.scannable.common.container.BlockModuleContainerMenu;
 import li.cil.scannable.common.scanning.ConfigurableBlockScannerModule;
 import li.cil.scannable.common.scanning.filter.IgnoredBlocks;
-import net.neoforged.api.distmarker.Dist;
-import net.neoforged.api.distmarker.OnlyIn;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceKey;
@@ -135,7 +133,6 @@ public final class ConfigurableBlockScannerModuleItem extends ScannerModuleItem 
     // --------------------------------------------------------------------- //
     // Item
 
-    @OnlyIn(Dist.CLIENT)
     @Override
     public void appendHoverText(final ItemStack stack, final Item.TooltipContext context, final TooltipDisplay tooltipDisplay, final Consumer<Component> tooltip, final TooltipFlag flag) {
         super.appendHoverText(stack, context, tooltipDisplay, tooltip, flag);

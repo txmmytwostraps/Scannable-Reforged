@@ -3,12 +3,9 @@ package li.cil.scannable.client.scanning;
 import li.cil.scannable.api.API;
 import li.cil.scannable.api.scanning.ScanResultProvider;
 import li.cil.scannable.util.RegistryUtils;
-import net.neoforged.api.distmarker.Dist;
-import net.neoforged.api.distmarker.OnlyIn;
 import net.neoforged.neoforge.registries.DeferredHolder;
 import net.neoforged.neoforge.registries.DeferredRegister;
 
-@OnlyIn(Dist.CLIENT)
 public final class ScanResultProviders {
     private static final DeferredRegister<ScanResultProvider> DEFERRED_REGISTER = RegistryUtils.get(ScanResultProvider.REGISTRY);
 

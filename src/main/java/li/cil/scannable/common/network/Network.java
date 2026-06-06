@@ -5,8 +5,6 @@ import li.cil.scannable.common.neoforge.ModEventBus;
 import li.cil.scannable.common.network.message.AbstractMessage;
 import li.cil.scannable.common.network.message.RemoveConfiguredModuleItemAtMessage;
 import li.cil.scannable.common.network.message.SetConfiguredModuleItemAtMessage;
-import net.neoforged.api.distmarker.Dist;
-import net.neoforged.api.distmarker.OnlyIn;
 import net.neoforged.neoforge.client.network.ClientPacketDistributor;
 import net.neoforged.neoforge.network.event.RegisterPayloadHandlersEvent;
 import net.neoforged.neoforge.network.registration.PayloadRegistrar;
@@ -26,7 +24,6 @@ public final class Network {
             (payload, context) -> context.enqueueWork(() -> payload.handleMessage(context)));
     }
 
-    @OnlyIn(Dist.CLIENT)
     public static void sendToServer(final AbstractMessage message) {
         ClientPacketDistributor.sendToServer(message);
     }

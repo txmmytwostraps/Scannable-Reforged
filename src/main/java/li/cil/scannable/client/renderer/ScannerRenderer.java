@@ -1,11 +1,8 @@
 package li.cil.scannable.client.renderer;
 
-import net.neoforged.api.distmarker.Dist;
-import net.neoforged.api.distmarker.OnlyIn;
 import net.minecraft.world.phys.Vec3;
 import org.joml.Matrix4f;
 
-@OnlyIn(Dist.CLIENT)
 public enum ScannerRenderer {
     INSTANCE;
 

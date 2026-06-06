@@ -2,8 +2,6 @@ package li.cil.scannable.api.prefab;
 
 import com.mojang.blaze3d.vertex.PoseStack;
 import li.cil.scannable.api.scanning.ScanResultProvider;
-import net.neoforged.api.distmarker.Dist;
-import net.neoforged.api.distmarker.OnlyIn;
 import net.minecraft.client.renderer.MultiBufferSource;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.Identifier;
@@ -18,7 +16,6 @@ import java.util.Collection;
  * Helper base class for scan result providers, providing some common
  * functionality for drawing result information.
  */
-@OnlyIn(Dist.CLIENT)
 public abstract class AbstractScanResultProvider implements ScanResultProvider {
     protected Player player;
     protected Vec3 center;

@@ -8,7 +8,6 @@ import li.cil.scannable.client.gui.ConfigurableEntityScannerModuleContainerScree
 import li.cil.scannable.client.gui.ScannerContainerScreen;
 import li.cil.scannable.common.container.Containers;
 import net.neoforged.api.distmarker.Dist;
-import net.neoforged.api.distmarker.OnlyIn;
 import net.neoforged.bus.api.SubscribeEvent;
 import net.neoforged.fml.common.EventBusSubscriber;
 import net.neoforged.fml.event.lifecycle.FMLClientSetupEvent;
@@ -16,7 +15,6 @@ import net.neoforged.neoforge.client.event.ClientTickEvent;
 import net.neoforged.neoforge.client.event.RegisterMenuScreensEvent;
 import net.neoforged.neoforge.common.NeoForge;
 
-@OnlyIn(Dist.CLIENT)
 @EventBusSubscriber(modid = API.MOD_ID, value = Dist.CLIENT)
 public final class ClientSetupNeoForge {
     @SubscribeEvent

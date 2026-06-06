@@ -1,7 +1,5 @@
 package li.cil.scannable.api.scanning;
 
-import net.neoforged.api.distmarker.Dist;
-import net.neoforged.api.distmarker.OnlyIn;
 import net.minecraft.world.item.ItemStack;
 
 import javax.annotation.Nullable;
@@ -66,7 +64,6 @@ public interface ScannerModule {
      * @return the id of the scan provider this module uses.
      */
     @Nullable
-    @OnlyIn(Dist.CLIENT)
     ScanResultProvider getResultProvider();
 
     /**
@@ -80,7 +77,6 @@ public interface ScannerModule {
      * @param range the input range.
      * @return the adjusted range.
      */
-    @OnlyIn(Dist.CLIENT)
     default float adjustGlobalRange(final float range) {
         return range;
     }

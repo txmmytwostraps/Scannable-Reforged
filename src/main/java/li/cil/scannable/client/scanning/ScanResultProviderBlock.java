@@ -13,8 +13,6 @@ import li.cil.scannable.client.ClientConfig;
 import li.cil.scannable.common.item.ScannerModuleItem;
 import li.cil.scannable.common.scanning.filter.IgnoredBlocks;
 import com.mojang.blaze3d.vertex.PoseStack;
-import net.neoforged.api.distmarker.Dist;
-import net.neoforged.api.distmarker.OnlyIn;
 import net.minecraft.client.Camera;
 import net.minecraft.client.renderer.MultiBufferSource;
 import net.minecraft.core.BlockPos;
@@ -43,7 +41,6 @@ import java.util.*;
 import java.util.function.Consumer;
 import java.util.function.Predicate;
 
-@OnlyIn(Dist.CLIENT)
 public final class ScanResultProviderBlock extends AbstractScanResultProvider {
     // Sanity performance check. Maybe some day I'll do some research on how to
     // do the clustering more efficiently, but for now this is good enough. We

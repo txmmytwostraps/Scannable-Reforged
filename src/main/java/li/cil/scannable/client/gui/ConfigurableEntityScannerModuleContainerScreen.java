@@ -5,8 +5,6 @@ import li.cil.scannable.common.container.EntityModuleContainerMenu;
 import li.cil.scannable.common.item.ConfigurableEntityScannerModuleItem;
 import li.cil.scannable.common.network.Network;
 import li.cil.scannable.common.network.message.SetConfiguredModuleItemAtMessage;
-import net.neoforged.api.distmarker.Dist;
-import net.neoforged.api.distmarker.OnlyIn;
 import net.minecraft.client.gui.GuiGraphicsExtractor;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.network.chat.Component;
@@ -17,7 +15,6 @@ import net.minecraft.world.item.SpawnEggItem;
 
 import java.util.List;
 
-@OnlyIn(Dist.CLIENT)
 public class ConfigurableEntityScannerModuleContainerScreen extends AbstractConfigurableScannerModuleContainerScreen<EntityModuleContainerMenu, EntityType<?>> {
     public ConfigurableEntityScannerModuleContainerScreen(final EntityModuleContainerMenu container, final Inventory inventory, final Component title) {
         super(container, inventory, title, Strings.GUI_ENTITIES_LIST_CAPTION);

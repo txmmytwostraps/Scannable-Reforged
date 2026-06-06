@@ -4,8 +4,6 @@ import li.cil.scannable.api.scanning.ScannerModule;
 import li.cil.scannable.common.neoforge.capabilities.Capabilities;
 import li.cil.scannable.common.config.CommonConfig;
 import li.cil.scannable.common.config.Strings;
-import net.neoforged.api.distmarker.Dist;
-import net.neoforged.api.distmarker.OnlyIn;
 import net.minecraft.network.chat.Component;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
@@ -49,7 +47,6 @@ public class ScannerModuleItem extends ModItem {
     // --------------------------------------------------------------------- //
     // Item
 
-    @OnlyIn(Dist.CLIENT)
     @Override
     public void appendHoverText(final ItemStack stack, final Item.TooltipContext context, final TooltipDisplay tooltipDisplay, final Consumer<Component> tooltip, final TooltipFlag flag) {
         super.appendHoverText(stack, context, tooltipDisplay, tooltip, flag);

@@ -8,8 +8,6 @@ import li.cil.scannable.client.scanning.filter.BlockScanFilter;
 import li.cil.scannable.client.scanning.filter.BlockTagScanFilter;
 import li.cil.scannable.common.config.CommonConfig;
 import li.cil.scannable.common.scanning.filter.IgnoredBlocks;
-import net.neoforged.api.distmarker.Dist;
-import net.neoforged.api.distmarker.OnlyIn;
 import net.neoforged.neoforge.common.Tags;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.resources.Identifier;
@@ -37,26 +35,22 @@ public enum RareOresBlockScannerModule implements BlockScannerModule {
         return CommonConfig.energyCostModuleOreRare;
     }
 
-    @OnlyIn(Dist.CLIENT)
     @Override
     public ScanResultProvider getResultProvider() {
         return ScanResultProviders.BLOCKS.get();
     }
 
-    @OnlyIn(Dist.CLIENT)
     @Override
     public float adjustLocalRange(final float range) {
         return range * CommonConfig.rangeModifierModuleOreRare;
     }
 
-    @OnlyIn(Dist.CLIENT)
     @Override
     public Predicate<BlockState> getFilter(final ItemStack module) {
         validateFilter();
         return filter;
     }
 
-    @OnlyIn(Dist.CLIENT)
     private void validateFilter() {
         if (filter != null) {
             return;
