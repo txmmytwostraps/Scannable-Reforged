@@ -52,3 +52,7 @@ logs/
 orig-*.txt
 compile-out.txt
 runclient-out.txt
+deps-out.txt
+*-src.txt
+src-*.txt
+jb.txt

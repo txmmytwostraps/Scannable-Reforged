@@ -14,6 +14,14 @@ java {
 
 repositories {
     mavenCentral()
+    // Just Enough Items (dev/test only — recipe + item lookup in the runClient).
+    maven("https://maven.blamejared.com")
+}
+
+dependencies {
+    // JEI is loaded only in the dev runs (not a compile dependency, not bundled in the jar). Lets us
+    // verify the 26.1 module recipes show up correctly in-game.
+    runtimeOnly("mezz.jei:jei-26.1.2-neoforge:29.6.2.31")
 }
 
 neoForge {
