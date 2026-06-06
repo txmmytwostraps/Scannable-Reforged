@@ -155,6 +155,10 @@ for (platform in enabledPlatforms.split(',')) {
 }
 
 spotless {
+    // The repo stores source as LF; pin spotless to LF so it doesn't rewrite every file to the
+    // platform-native ending (CRLF on Windows) and report spurious "changes".
+    lineEndings = com.diffplug.spotless.LineEnding.UNIX
+
     java {
         target("*/src/*/java/li/cil/**/*.java")
 
