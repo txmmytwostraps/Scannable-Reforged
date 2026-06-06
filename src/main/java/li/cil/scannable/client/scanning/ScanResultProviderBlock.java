@@ -14,10 +14,9 @@ import li.cil.scannable.common.item.ScannerModuleItem;
 import li.cil.scannable.common.scanning.filter.IgnoredBlocks;
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.blaze3d.vertex.VertexConsumer;
+import li.cil.scannable.client.renderer.ScanResultRenderType;
 import net.minecraft.client.Camera;
 import net.minecraft.client.renderer.MultiBufferSource;
-import net.minecraft.client.renderer.ShapeRenderer;
-import net.minecraft.client.renderer.rendertype.RenderTypes;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.SectionPos;
 import net.minecraft.core.registries.BuiltInRegistries;
@@ -38,7 +37,6 @@ import net.minecraft.world.level.chunk.PalettedContainer;
 import net.minecraft.world.level.material.FluidState;
 import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.Vec3;
-import net.minecraft.world.phys.shapes.Shapes;
 
 import javax.annotation.Nullable;
 import java.util.*;
@@ -222,17 +220,47 @@ public final class ScanResultProviderBlock extends AbstractScanResultProvider {
             return;
         }
 
-        // Phase 3b first pass: render each result cluster as a wireframe outline via the vanilla
-        // lines render type + ShapeRenderer helper (filled, through-wall boxes come next).
-        final VertexConsumer buffer = bufferSource.getBuffer(RenderTypes.lines());
+        // Filled, translucent, through-wall boxes around each result cluster.
+        final VertexConsumer buffer = bufferSource.getBuffer(ScanResultRenderType.TYPE);
+        final PoseStack.Pose pose = poseStack.last();
         for (final ScanResult result : results) {
             final AABB bounds = result.getRenderBounds();
             if (bounds == null) {
                 continue;
             }
-            final int color = 0xFF000000 | ((BlockScanResult) result).color;
-            ShapeRenderer.renderShape(poseStack, buffer, Shapes.create(bounds), 0.0, 0.0, 0.0, color, 1.0f);
+            final int c = ((BlockScanResult) result).color;
+            addBox(buffer, pose, bounds, ((c >> 16) & 0xFF) / 255.0f, ((c >> 8) & 0xFF) / 255.0f, (c & 0xFF) / 255.0f, 0.45f);
         }
+    }
+
+    private static void addBox(final VertexConsumer buffer, final PoseStack.Pose pose, final AABB box, final float r, final float g, final float b, final float a) {
+        final float x0 = (float) box.minX, y0 = (float) box.minY, z0 = (float) box.minZ;
+        final float x1 = (float) box.maxX, y1 = (float) box.maxY, z1 = (float) box.maxZ;
+        // Six quad faces (cull is off, so winding is irrelevant). POSITION_COLOR.
+        buffer.addVertex(pose, x0, y0, z0).setColor(r, g, b, a);
+        buffer.addVertex(pose, x0, y0, z1).setColor(r, g, b, a);
+        buffer.addVertex(pose, x0, y1, z1).setColor(r, g, b, a);
+        buffer.addVertex(pose, x0, y1, z0).setColor(r, g, b, a);
+        buffer.addVertex(pose, x1, y0, z1).setColor(r, g, b, a);
+        buffer.addVertex(pose, x1, y0, z0).setColor(r, g, b, a);
+        buffer.addVertex(pose, x1, y1, z0).setColor(r, g, b, a);
+        buffer.addVertex(pose, x1, y1, z1).setColor(r, g, b, a);
+        buffer.addVertex(pose, x0, y0, z0).setColor(r, g, b, a);
+        buffer.addVertex(pose, x1, y0, z0).setColor(r, g, b, a);
+        buffer.addVertex(pose, x1, y0, z1).setColor(r, g, b, a);
+        buffer.addVertex(pose, x0, y0, z1).setColor(r, g, b, a);
+        buffer.addVertex(pose, x0, y1, z1).setColor(r, g, b, a);
+        buffer.addVertex(pose, x1, y1, z1).setColor(r, g, b, a);
+        buffer.addVertex(pose, x1, y1, z0).setColor(r, g, b, a);
+        buffer.addVertex(pose, x0, y1, z0).setColor(r, g, b, a);
+        buffer.addVertex(pose, x1, y0, z0).setColor(r, g, b, a);
+        buffer.addVertex(pose, x0, y0, z0).setColor(r, g, b, a);
+        buffer.addVertex(pose, x0, y1, z0).setColor(r, g, b, a);
+        buffer.addVertex(pose, x1, y1, z0).setColor(r, g, b, a);
+        buffer.addVertex(pose, x0, y0, z1).setColor(r, g, b, a);
+        buffer.addVertex(pose, x1, y0, z1).setColor(r, g, b, a);
+        buffer.addVertex(pose, x1, y1, z1).setColor(r, g, b, a);
+        buffer.addVertex(pose, x0, y1, z1).setColor(r, g, b, a);
     }
 
     @Override

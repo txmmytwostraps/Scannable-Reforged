@@ -6,6 +6,7 @@ import li.cil.scannable.client.ScanManager;
 import li.cil.scannable.client.gui.ConfigurableBlockScannerModuleContainerScreen;
 import li.cil.scannable.client.gui.ConfigurableEntityScannerModuleContainerScreen;
 import li.cil.scannable.client.gui.ScannerContainerScreen;
+import li.cil.scannable.client.renderer.ScanResultRenderType;
 import li.cil.scannable.common.container.Containers;
 import net.minecraft.client.Minecraft;
 import net.neoforged.api.distmarker.Dist;
@@ -14,6 +15,7 @@ import net.neoforged.fml.common.EventBusSubscriber;
 import net.neoforged.fml.event.lifecycle.FMLClientSetupEvent;
 import net.neoforged.neoforge.client.event.ClientTickEvent;
 import net.neoforged.neoforge.client.event.RegisterMenuScreensEvent;
+import net.neoforged.neoforge.client.event.RegisterRenderPipelinesEvent;
 import net.neoforged.neoforge.client.event.RenderLevelStageEvent;
 import net.neoforged.neoforge.common.NeoForge;
 
@@ -33,6 +35,11 @@ public final class ClientSetupNeoForge {
     public static void handleRenderLevel(final RenderLevelStageEvent.AfterTranslucentBlocks event) {
         final float partialTick = Minecraft.getInstance().getDeltaTracker().getGameTimeDeltaPartialTick(false);
         ScanManager.renderLevel(event.getPoseStack(), partialTick);
+    }
+
+    @SubscribeEvent
+    public static void handleRegisterRenderPipelines(final RegisterRenderPipelinesEvent event) {
+        event.registerPipeline(ScanResultRenderType.PIPELINE);
     }
 
     @SubscribeEvent
