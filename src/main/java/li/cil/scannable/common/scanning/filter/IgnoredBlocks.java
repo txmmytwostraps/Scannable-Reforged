@@ -37,7 +37,7 @@ public enum IgnoredBlocks {
         }
 
         final List<TagKey<Block>> ignoredTags = new ArrayList<>();
-        BuiltInRegistries.BLOCK.getTagNames().forEach(namedTag -> {
+        BuiltInRegistries.BLOCK.getTags().map(named -> named.key()).forEach(namedTag -> {
             if (CommonConfig.ignoredBlockTags.contains(namedTag.location())) {
                 ignoredTags.add(namedTag);
             }

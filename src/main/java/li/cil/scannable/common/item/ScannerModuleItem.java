@@ -10,9 +10,11 @@ import net.minecraft.network.chat.Component;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.TooltipFlag;
+import net.minecraft.world.item.component.TooltipDisplay;
 import org.jetbrains.annotations.Contract;
 
 import java.util.List;
+import java.util.function.Consumer;
 import java.util.Optional;
 
 public class ScannerModuleItem extends ModItem {
@@ -49,12 +51,12 @@ public class ScannerModuleItem extends ModItem {
 
     @OnlyIn(Dist.CLIENT)
     @Override
-    public void appendHoverText(final ItemStack stack, final Item.TooltipContext context, final List<Component> tooltip, final TooltipFlag flag) {
-        super.appendHoverText(stack, context, tooltip, flag);
+    public void appendHoverText(final ItemStack stack, final Item.TooltipContext context, final TooltipDisplay tooltipDisplay, final Consumer<Component> tooltip, final TooltipFlag flag) {
+        super.appendHoverText(stack, context, tooltipDisplay, tooltip, flag);
 
         final int cost = getModuleEnergyCost(stack);
         if (cost > 0) {
-            tooltip.add(Strings.energyUsage(cost));
+            tooltip.accept(Strings.energyUsage(cost));
         }
     }
 }

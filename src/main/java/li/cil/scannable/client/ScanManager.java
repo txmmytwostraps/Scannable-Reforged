@@ -48,7 +48,7 @@ public final class ScanManager {
     // --------------------------------------------------------------------- //
 
     private static float computeTargetRadius() {
-        return Minecraft.getInstance().gameRenderer.getRenderDistance();
+        return Minecraft.getInstance().options.getEffectiveRenderDistance() * 16.0f;
     }
 
     public static int computeScanGrowthDuration() {
@@ -243,78 +243,13 @@ public final class ScanManager {
     }
 
     public static void renderLevel(final float partialTick) {
-        synchronized (renderingResults) {
-            if (renderingResults.isEmpty()) {
-                return;
-            }
-
-            render(ScanResultRenderContext.WORLD, partialTick, worldViewModelStack, worldProjectionMatrix);
-        }
+        // TODO(Phase 3b/3c): re-enable world result rendering once the render path is rebuilt.
+        // The 1.21.1 path drove RenderSystem matrix/state + per-provider VBO rendering, all removed
+        // in 1.21.5/1.21.6. Stubbed for the launchable build.
     }
 
     public static void renderGui(final float partialTick) {
-        synchronized (renderingResults) {
-            if (renderingResults.isEmpty()) {
-                return;
-            }
-
-            // Using shaders, so we render as game overlay; restore matrices as used for level rendering.
-            RenderSystem.backupProjectionMatrix();
-            RenderSystem.setProjectionMatrix(worldProjectionMatrix, VertexSorting.ORTHOGRAPHIC_Z);
-            RenderSystem.getModelViewStack().pushMatrix();
-            RenderSystem.getModelViewStack().identity();
-            RenderSystem.applyModelViewMatrix();
-
-            render(ScanResultRenderContext.GUI, partialTick, worldViewModelStack, worldProjectionMatrix);
-
-            RenderSystem.getModelViewStack().popMatrix();
-            RenderSystem.applyModelViewMatrix();
-            RenderSystem.restoreProjectionMatrix();
-        }
-    }
-
-    private static void render(final ScanResultRenderContext context, final float partialTicks, final PoseStack poseStack, final Matrix4f projectionMatrix) {
-        final Camera camera = Minecraft.getInstance().gameRenderer.getMainCamera();
-        final Vec3 pos = camera.getPosition();
-
-        final Frustum frustum = new Frustum(poseStack.last().pose(), projectionMatrix);
-        frustum.prepare(pos.x(), pos.y(), pos.z());
-
-        RenderSystem.disableDepthTest();
-        RenderSystem.setShaderColor(1, 1, 1, 1);
-
-        poseStack.pushPose();
-        poseStack.translate(-pos.x, -pos.y, -pos.z);
-
-        // We render all results in batches, grouped by their provider.
-        // This allows providers to do more optimized rendering, in e.g.
-        // setting up the render state once before rendering all visuals,
-        // or even set up display lists or VBOs.
-        final MultiBufferSource.BufferSource renderTypeBuffer = MultiBufferSource.immediate(RENDER_BUFFER);
-        try {
-            for (final Map.Entry<ScanResultProvider, List<ScanResult>> entry : renderingResults.entrySet()) {
-                // Quick and dirty frustum culling.
-                for (final ScanResult result : entry.getValue()) {
-                    final AABB bounds = result.getRenderBounds();
-                    if (bounds == null || frustum.isVisible(bounds)) {
-                        renderingList.add(result);
-                    }
-                }
-
-                if (!renderingList.isEmpty()) {
-                    entry.getKey().render(context, renderTypeBuffer, poseStack, camera, partialTicks, renderingList);
-                    renderingList.clear();
-                }
-            }
-        } finally {
-            renderingList.clear();
-        }
-
-        renderTypeBuffer.endBatch();
-
-        poseStack.popPose();
-
-        RenderSystem.enableDepthTest();
+        // TODO(Phase 3b): re-enable the GUI result overlay once the render path is rebuilt.
     }
 
     // --------------------------------------------------------------------- //

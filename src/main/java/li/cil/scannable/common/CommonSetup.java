@@ -29,7 +29,7 @@ public final class CommonSetup {
         Containers.initialize();
         Network.initialize();
 
-        if (FMLEnvironment.dist == Dist.CLIENT) {
+        if (FMLEnvironment.getDist() == Dist.CLIENT) {
             ScanResultProviders.initialize();
             ProviderCacheManager.initialize();
         }

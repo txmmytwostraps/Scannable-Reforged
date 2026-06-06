@@ -98,35 +98,9 @@ public final class ScanResultProviderEntity extends AbstractScanResultProvider {
 
     @Override
     public void render(final ScanResultRenderContext context, final MultiBufferSource bufferSource, final PoseStack poseStack, final Camera renderInfo, final float partialTicks, final List<ScanResult> results) {
-        if (context != ScanResultRenderContext.GUI) {
-            return;
-        }
-
-        final float yaw = renderInfo.getYRot();
-        final float pitch = renderInfo.getXRot();
-
-        final Vec3 lookVec = new Vec3(renderInfo.getLookVector());
-        final Vec3 viewerEyes = renderInfo.getPosition();
-
-        final boolean showDistance = renderInfo.getEntity().isShiftKeyDown();
-
-        // Order results by distance to center of screen (deviation from look
-        // vector) so that labels we're looking at are in front of others.
-        results.sort(Comparator.comparing(result -> {
-            final ScanResultEntity resultEntity = (ScanResultEntity) result;
-            final Vec3 entityEyes = resultEntity.entity.getEyePosition(partialTicks);
-            final Vec3 toResult = entityEyes.subtract(viewerEyes);
-            return lookVec.dot(toResult.normalize());
-        }));
-
-        for (final ScanResult result : results) {
-            final ScanResultEntity resultEntity = (ScanResultEntity) result;
-            final Component name = resultEntity.entity.getName();
-            final Identifier icon = resultEntity.getIcon();
-            final Vec3 resultPos = resultEntity.entity.getEyePosition(partialTicks);
-            final float distance = showDistance ? (float) resultPos.subtract(viewerEyes).length() : 0f;
-            renderIconLabel(bufferSource, poseStack, yaw, pitch, lookVec, viewerEyes, distance, resultPos, icon, name);
-        }
+        // TODO(Phase 3b): rebuild GUI entity-label rendering once renderIconLabel is restored. The
+        // old path read Camera.getYRot/getXRot/getLookVector/getPosition (changed in 26.1) and drew
+        // via the removed RenderType path. Stubbed for the launchable build.
     }
 
     @Override
@@ -157,7 +131,7 @@ public final class ScanResultProviderEntity extends AbstractScanResultProvider {
 
         @Override
         public AABB getRenderBounds() {
-            return entity.getBoundingBoxForCulling();
+            return entity.getBoundingBox();
         }
     }
 }

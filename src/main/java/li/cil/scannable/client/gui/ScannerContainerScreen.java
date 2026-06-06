@@ -26,8 +26,7 @@ public class ScannerContainerScreen extends AbstractContainerScreen<ScannerConta
     // --------------------------------------------------------------------- //
 
     public ScannerContainerScreen(final ScannerContainerMenu container, final Inventory inventory, final Component title) {
-        super(container, inventory, title);
-        imageHeight = 159;
+        super(container, inventory, title, 176, 159);
         inventoryLabelX = 8;
         inventoryLabelY = 65;
     }

@@ -9,6 +9,7 @@ import net.neoforged.api.distmarker.Dist;
 import net.neoforged.api.distmarker.OnlyIn;
 import net.minecraft.client.gui.GuiGraphicsExtractor;
 import net.minecraft.client.gui.screens.inventory.AbstractContainerScreen;
+import net.minecraft.client.input.MouseButtonEvent;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.Identifier;
 import net.minecraft.world.entity.player.Inventory;
@@ -32,11 +33,10 @@ public abstract class AbstractConfigurableScannerModuleContainerScreen<TContaine
     // --------------------------------------------------------------------- //
 
     public AbstractConfigurableScannerModuleContainerScreen(final TContainer container, final Inventory inventory, final Component title, final Component listCaption) {
-        super(container, inventory, title);
+        super(container, inventory, title, 176, 133);
         this.listCaption = listCaption;
         this.inventory = inventory;
 
-        imageHeight = 133;
         inventoryLabelX = 8;
         inventoryLabelY = 39;
     }
@@ -103,7 +103,9 @@ public abstract class AbstractConfigurableScannerModuleContainerScreen<TContaine
     }
 
     @Override
-    public boolean mouseClicked(final double mouseX, final double mouseY, final int button) {
+    public boolean mouseClicked(final MouseButtonEvent event, final boolean doubleClick) {
+        final double mouseX = event.x();
+        final double mouseY = event.y();
         for (int slot = 0; slot < Constants.CONFIGURABLE_MODULE_SLOTS; slot++) {
             final int x = SLOTS_ORIGIN_X + slot * SLOT_SIZE;
             final int y = SLOTS_ORIGIN_Y;
@@ -119,7 +121,7 @@ public abstract class AbstractConfigurableScannerModuleContainerScreen<TContaine
             }
         }
 
-        return super.mouseClicked(mouseX, mouseY, button);
+        return super.mouseClicked(event, doubleClick);
     }
 
     @Override

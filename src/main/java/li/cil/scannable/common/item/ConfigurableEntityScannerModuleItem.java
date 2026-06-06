@@ -22,11 +22,13 @@ import net.minecraft.world.inventory.AbstractContainerMenu;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.TooltipFlag;
+import net.minecraft.world.item.component.TooltipDisplay;
 import net.minecraft.world.level.Level;
 
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.function.Consumer;
 import java.util.Optional;
 
 public final class ConfigurableEntityScannerModuleItem extends ScannerModuleItem {
@@ -133,13 +135,13 @@ public final class ConfigurableEntityScannerModuleItem extends ScannerModuleItem
 
     @OnlyIn(Dist.CLIENT)
     @Override
-    public void appendHoverText(final ItemStack stack, final Item.TooltipContext context, final List<Component> tooltip, final TooltipFlag flag) {
-        super.appendHoverText(stack, context, tooltip, flag);
+    public void appendHoverText(final ItemStack stack, final Item.TooltipContext context, final TooltipDisplay tooltipDisplay, final Consumer<Component> tooltip, final TooltipFlag flag) {
+        super.appendHoverText(stack, context, tooltipDisplay, tooltip, flag);
 
         final List<EntityType<?>> entities = getEntityTypes(stack);
         if (!entities.isEmpty()) {
-            tooltip.add(Strings.TOOLTIP_ENTITIES_LIST_CAPTION);
-            entities.forEach(e -> tooltip.add(Strings.listItem(e.getDescription())));
+            tooltip.accept(Strings.TOOLTIP_ENTITIES_LIST_CAPTION);
+            entities.forEach(e -> tooltip.accept(Strings.listItem(e.getDescription())));
         }
     }
 
@@ -175,7 +177,7 @@ public final class ConfigurableEntityScannerModuleItem extends ScannerModuleItem
             player.getInventory().setChanged();
         } else {
             if (!player.level().isClientSide() && !ConfigurableEntityScannerModuleItem.isLocked(stack)) {
-                player.displayClientMessage(Strings.MESSAGE_NO_FREE_SLOTS, true);
+                player.sendOverlayMessage(Strings.MESSAGE_NO_FREE_SLOTS);
             }
         }
 

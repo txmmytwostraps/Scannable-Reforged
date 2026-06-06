@@ -57,6 +57,10 @@ tasks.named<Jar>("jar") {
 }
 
 tasks.named<ProcessResources>("processResources") {
+    // src/main/resources (committed data) and src/generated/resources (datagen output) can carry
+    // the same model/recipe/tag JSONs; prefer the committed copy and skip the generated duplicate.
+    duplicatesStrategy = DuplicatesStrategy.EXCLUDE
+
     val props = mapOf(
         "version" to version.toString(),
         "minecraftVersion" to "26.1.2",

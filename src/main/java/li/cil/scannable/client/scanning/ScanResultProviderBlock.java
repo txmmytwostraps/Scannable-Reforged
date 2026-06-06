@@ -90,15 +90,15 @@ public final class ScanResultProviderBlock extends AbstractScanResultProvider {
 
             final BlockPos minBlockPos = BlockPos.containing(center).offset(-this.radius, -this.radius, -this.radius);
             final BlockPos maxBlockPos = BlockPos.containing(center).offset(this.radius, this.radius, this.radius);
-            final ChunkPos minChunkPos = new ChunkPos(minBlockPos);
-            final ChunkPos maxChunkPos = new ChunkPos(maxBlockPos);
+            final ChunkPos minChunkPos = new ChunkPos(minBlockPos.getX() >> 4, minBlockPos.getZ() >> 4);
+            final ChunkPos maxChunkPos = new ChunkPos(maxBlockPos.getX() >> 4, maxBlockPos.getZ() >> 4);
 
             final int minChunkSectionIndex = Math.max(player.level().getSectionIndex(minBlockPos.getY()), 0);
             final int maxChunkSectionIndex = Math.min(player.level().getSectionIndex(maxBlockPos.getY()), player.level().getSectionsCount() - 1);
 
             for (int chunkSectionIndex = minChunkSectionIndex; chunkSectionIndex <= maxChunkSectionIndex; chunkSectionIndex++) {
-                for (int chunkZ = minChunkPos.z; chunkZ <= maxChunkPos.z; chunkZ++) {
-                    for (int chunkX = minChunkPos.x; chunkX <= maxChunkPos.x; chunkX++) {
+                for (int chunkZ = minChunkPos.z(); chunkZ <= maxChunkPos.z(); chunkZ++) {
+                    for (int chunkX = minChunkPos.x(); chunkX <= maxChunkPos.x(); chunkX++) {
                         final ChunkPos chunkPos = new ChunkPos(chunkX, chunkZ);
                         final int chunkY = player.level().getSectionYFromSectionIndex(chunkSectionIndex);
 

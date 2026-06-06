@@ -14,7 +14,7 @@ public final class Items {
 
     public static final DeferredHolder<Item, ? extends Item> SCANNER = ITEMS.register("scanner", ScannerItem::new);
 
-    public static final DeferredHolder<Item, ? extends Item> BLANK_MODULE = ITEMS.register("blank_module", ModItem::new);
+    public static final DeferredHolder<Item, ? extends Item> BLANK_MODULE = ITEMS.register("blank_module", () -> new ModItem());
     public static final DeferredHolder<Item, ? extends Item> RANGE_MODULE = ITEMS.register("range_module", () -> new ScannerModuleItem(RangeScannerModule.INSTANCE));
     public static final DeferredHolder<Item, ? extends Item> ENTITY_MODULE = ITEMS.register("entity_module", ConfigurableEntityScannerModuleItem::new);
     public static final DeferredHolder<Item, ? extends Item> FRIENDLY_ENTITY_MODULE = ITEMS.register("friendly_entity_module", () -> new ScannerModuleItem(FriendlyEntityScannerModule.INSTANCE));

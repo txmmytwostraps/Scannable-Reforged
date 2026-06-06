@@ -62,7 +62,7 @@ public enum SpawnerBlockScannerModule implements BlockScannerModule {
             BuiltInRegistries.BLOCK.getOptional(location).ifPresent(block ->
                 filters.add(new BlockScanFilter(block)));
         }
-        BuiltInRegistries.BLOCK.getTagNames().forEach(tag -> {
+        BuiltInRegistries.BLOCK.getTags().map(named -> named.key()).forEach(tag -> {
             if (CommonConfig.spawnerBlockTags.contains(tag.location())) {
                 filters.add(new BlockTagScanFilter(tag));
             }

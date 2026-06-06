@@ -56,7 +56,7 @@ public enum FluidBlockScannerModule implements BlockScannerModule {
         }
 
         final List<Predicate<BlockState>> filters = new ArrayList<>();
-        BuiltInRegistries.FLUID.getTagNames().forEach(tag -> {
+        BuiltInRegistries.FLUID.getTags().map(named -> named.key()).forEach(tag -> {
             if (!CommonConfig.ignoredFluidTags.contains(tag.location())) {
                 filters.add(new FluidTagScanFilter(tag));
             }
