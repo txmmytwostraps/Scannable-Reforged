@@ -72,12 +72,6 @@ public abstract class AbstractScanResultProvider implements ScanResultProvider {
         final Vec3 toResult = resultPos.subtract(viewerEyes);
         final float distance = (float) toResult.length();
         final float lookDirDot = (float) lookVec.dot(toResult.normalize());
-
-        // Only show the label when looking (almost) directly at the result.
-        if (lookDirDot <= 0.999f || label == null) {
-            return;
-        }
-
         final float sqLookDirDot = lookDirDot * lookDirDot;
         final float sq2LookDirDot = sqLookDirDot * sqLookDirDot;
         final float focusScale = Mth.clamp(sq2LookDirDot * sq2LookDirDot + 0.005f, 0.5f, 1f);
@@ -89,35 +83,51 @@ public abstract class AbstractScanResultProvider implements ScanResultProvider {
         poseStack.mulPose(new Quaternionf().rotationX(toRadians(pitch)));
         poseStack.scale(-scale, -scale, scale);
 
-        final Component text;
-        if (displayDistance > 0) {
-            text = withDistance(label, Mth.ceil(displayDistance));
-        } else {
-            text = label;
+        // The name label (with its background) only shows when looking (almost) directly at the result.
+        if (lookDirDot > 0.999f && label != null) {
+            final Component text;
+            if (displayDistance > 0) {
+                text = withDistance(label, Mth.ceil(displayDistance));
+            } else {
+                text = label;
+            }
+
+            final Font font = Minecraft.getInstance().font;
+            final int width = font.width(text) + 16;
+
+            poseStack.pushPose();
+            poseStack.translate(width / 2f, 0, 0);
+            drawQuad(bufferSource.getBuffer(ScanResultRenderType.TYPE), poseStack, width, font.lineHeight + 5, 0, 0, 0, 0.6f);
+            poseStack.popPose();
+
+            font.drawInBatch(text, 12, -4, 0xFFFFFFFF, false, poseStack.last().pose(), bufferSource, Font.DisplayMode.SEE_THROUGH, 0, 0xf000f0);
         }
 
-        final Font font = Minecraft.getInstance().font;
-        final int width = font.width(text) + 16;
-
-        poseStack.pushPose();
-        poseStack.translate(width / 2f, 0, 0);
-        drawQuad(bufferSource.getBuffer(ScanResultRenderType.TYPE), poseStack, width, font.lineHeight + 5, 0, 0, 0, 0.6f);
-        poseStack.popPose();
-
-        font.drawInBatch(text, 12, -4, 0xFFFFFFFF, false, poseStack.last().pose(), bufferSource, Font.DisplayMode.SEE_THROUGH, 0, 0xf000f0);
+        // The icon is always drawn (billboarded) so results are visible even when not focused.
+        drawTexturedQuad(bufferSource.getBuffer(ScanResultRenderType.icon(icon)), poseStack, 16, 16);
 
         poseStack.popPose();
     }
 
     // --------------------------------------------------------------------- //
-    // Drawing simple primitives in an existing buffer (POSITION_COLOR).
+    // Drawing simple primitives in an existing buffer.
 
+    // POSITION_COLOR quad (label background).
     protected static void drawQuad(final VertexConsumer buffer, final PoseStack poseStack, final float width, final float height, final float r, final float g, final float b, final float a) {
         final var matrix = poseStack.last().pose();
         buffer.addVertex(matrix, -width * 0.5f, height * 0.5f, 0).setColor(r, g, b, a);
         buffer.addVertex(matrix, width * 0.5f, height * 0.5f, 0).setColor(r, g, b, a);
         buffer.addVertex(matrix, width * 0.5f, -height * 0.5f, 0).setColor(r, g, b, a);
         buffer.addVertex(matrix, -width * 0.5f, -height * 0.5f, 0).setColor(r, g, b, a);
+    }
+
+    // POSITION_TEX_COLOR quad (textured icon; full 0..1 UV, white tint).
+    protected static void drawTexturedQuad(final VertexConsumer buffer, final PoseStack poseStack, final float width, final float height) {
+        final var matrix = poseStack.last().pose();
+        buffer.addVertex(matrix, -width * 0.5f, height * 0.5f, 0).setUv(0, 1).setColor(1f, 1f, 1f, 1f);
+        buffer.addVertex(matrix, width * 0.5f, height * 0.5f, 0).setUv(1, 1).setColor(1f, 1f, 1f, 1f);
+        buffer.addVertex(matrix, width * 0.5f, -height * 0.5f, 0).setUv(1, 0).setColor(1f, 1f, 1f, 1f);
+        buffer.addVertex(matrix, -width * 0.5f, -height * 0.5f, 0).setUv(0, 0).setColor(1f, 1f, 1f, 1f);
     }
 
     // --------------------------------------------------------------------- //

@@ -9,6 +9,9 @@ import net.minecraft.client.renderer.rendertype.RenderSetup;
 import net.minecraft.client.renderer.rendertype.RenderType;
 import net.minecraft.resources.Identifier;
 
+import java.util.HashMap;
+import java.util.Map;
+
 /**
  * Render type for the scan-result boxes: filled, translucent, two-sided (no cull) and drawn
  * through walls (depth test always passes, no depth write) so highlighted ores show behind terrain.
@@ -30,6 +33,22 @@ public final class ScanResultRenderType {
         .build();
 
     public static final RenderType LINES_TYPE = RenderType.create(API.MOD_ID + ":scan_result_lines", RenderSetup.builder(LINES_PIPELINE).createRenderSetup());
+
+    // Textured, translucent, two-sided, through-wall pipeline for the billboarded result icons.
+    // Derived from the GUI textured snippet (core/position_tex_color / Sampler0 / NO_DEPTH_TEST).
+    public static final RenderPipeline ICON_PIPELINE = RenderPipeline.builder(RenderPipelines.GUI_TEXTURED_SNIPPET)
+        .withLocation(Identifier.fromNamespaceAndPath(API.MOD_ID, "pipeline/scan_icon"))
+        .withCull(false)
+        .build();
+
+    // One render type per icon texture (the texture is bound on the RenderSetup, not the pipeline).
+    private static final Map<Identifier, RenderType> ICON_TYPES = new HashMap<>();
+
+    public static RenderType icon(final Identifier texture) {
+        return ICON_TYPES.computeIfAbsent(texture, tex -> RenderType.create(
+            API.MOD_ID + ":scan_icon/" + tex,
+            RenderSetup.builder(ICON_PIPELINE).withTexture("Sampler0", tex).createRenderSetup()));
+    }
 
     private ScanResultRenderType() {
     }

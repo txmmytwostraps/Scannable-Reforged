@@ -41,6 +41,7 @@ public final class ClientSetupNeoForge {
     public static void handleRegisterRenderPipelines(final RegisterRenderPipelinesEvent event) {
         event.registerPipeline(ScanResultRenderType.PIPELINE);
         event.registerPipeline(ScanResultRenderType.LINES_PIPELINE);
+        event.registerPipeline(ScanResultRenderType.ICON_PIPELINE);
     }
 
     @SubscribeEvent
