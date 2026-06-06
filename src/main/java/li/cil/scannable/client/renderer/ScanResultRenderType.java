@@ -56,6 +56,26 @@ public final class ScanResultRenderType {
             RenderSetup.builder(ICON_PIPELINE).withTexture("Sampler0", tex).createRenderSetup()));
     }
 
+    // Animated per-box shimmer (additive, through walls): the result-box fill, drawn with the
+    // scan_result shader (scrolling scanlines + pulse + edge glow). World geometry, so it reuses the
+    // vanilla core/position_tex_color vertex shader (ProjMat * ModelViewMat + UV/colour passthrough);
+    // the fragment reads GameTime from the auto-bound Globals UBO, so it renders through the normal
+    // buffered path (no manual pass needed).
+    public static final RenderPipeline SHIMMER_PIPELINE = RenderPipeline.builder()
+        .withLocation(Identifier.fromNamespaceAndPath(API.MOD_ID, "pipeline/scan_result"))
+        .withVertexShader("core/position_tex_color")
+        .withFragmentShader(Identifier.fromNamespaceAndPath(API.MOD_ID, "core/scan_result"))
+        .withUniform("Projection", UniformType.UNIFORM_BUFFER)
+        .withUniform("DynamicTransforms", UniformType.UNIFORM_BUFFER)
+        .withUniform("Globals", UniformType.UNIFORM_BUFFER)
+        .withColorTargetState(new ColorTargetState(BlendFunction.ADDITIVE))
+        .withDepthStencilState(new DepthStencilState(CompareOp.ALWAYS_PASS, false))
+        .withCull(false)
+        .withVertexFormat(DefaultVertexFormat.POSITION_TEX_COLOR, VertexFormat.Mode.QUADS)
+        .build();
+
+    public static final RenderType SHIMMER_TYPE = RenderType.create(API.MOD_ID + ":scan_result", RenderSetup.builder(SHIMMER_PIPELINE).createRenderSetup());
+
     // Fullscreen scan-reveal effect: samples the main depth buffer and additively paints the
     // expanding spherical wave. No vertex buffer (core/screenquad generates the fullscreen triangle
     // from gl_VertexID); no depth test/write; additive blend. Drawn via a manual RenderPass in

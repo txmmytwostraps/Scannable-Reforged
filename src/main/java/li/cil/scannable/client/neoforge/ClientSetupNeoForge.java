@@ -6,6 +6,7 @@ import li.cil.scannable.client.ScanManager;
 import li.cil.scannable.client.gui.ConfigurableBlockScannerModuleContainerScreen;
 import li.cil.scannable.client.gui.ConfigurableEntityScannerModuleContainerScreen;
 import li.cil.scannable.client.gui.ScannerContainerScreen;
+import li.cil.scannable.client.renderer.OverlayRenderer;
 import li.cil.scannable.client.renderer.ScanResultRenderType;
 import li.cil.scannable.client.renderer.ScannerRenderer;
 import li.cil.scannable.common.container.Containers;
@@ -15,6 +16,8 @@ import net.neoforged.bus.api.SubscribeEvent;
 import net.neoforged.fml.common.EventBusSubscriber;
 import net.neoforged.fml.event.lifecycle.FMLClientSetupEvent;
 import net.neoforged.neoforge.client.event.ClientTickEvent;
+import net.minecraft.resources.Identifier;
+import net.neoforged.neoforge.client.event.RegisterGuiLayersEvent;
 import net.neoforged.neoforge.client.event.RegisterMenuScreensEvent;
 import net.neoforged.neoforge.client.event.RegisterRenderPipelinesEvent;
 import net.neoforged.neoforge.client.event.RenderLevelStageEvent;
@@ -47,6 +50,14 @@ public final class ClientSetupNeoForge {
         event.registerPipeline(ScanResultRenderType.LINES_PIPELINE);
         event.registerPipeline(ScanResultRenderType.ICON_PIPELINE);
         event.registerPipeline(ScanResultRenderType.SCAN_EFFECT_PIPELINE);
+        event.registerPipeline(ScanResultRenderType.SHIMMER_PIPELINE);
+    }
+
+    @SubscribeEvent
+    public static void handleRegisterGuiLayers(final RegisterGuiLayersEvent event) {
+        // The radial scan-progress ring shown while channeling the scanner.
+        event.registerAboveAll(Identifier.fromNamespaceAndPath(API.MOD_ID, "scan_progress"),
+            (graphics, deltaTracker) -> OverlayRenderer.render(graphics, deltaTracker.getGameTimeDeltaPartialTick(false)));
     }
 
     @SubscribeEvent

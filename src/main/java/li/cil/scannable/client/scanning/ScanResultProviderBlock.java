@@ -234,16 +234,18 @@ public final class ScanResultProviderBlock extends AbstractScanResultProvider {
 
         final PoseStack.Pose pose = poseStack.last();
 
-        // Pass 1: subtle translucent fill, contouring the actual ore cells (a single ore is one box).
-        final VertexConsumer fill = bufferSource.getBuffer(ScanResultRenderType.TYPE);
+        // Pass 1: animated shimmer fill (additive scanlines + pulse + edge glow), contouring the
+        // actual ore cells. Additive blend uses the colour magnitude, so pass the ore colour at full
+        // intensity and let the shader modulate it.
+        final VertexConsumer fill = bufferSource.getBuffer(ScanResultRenderType.SHIMMER_TYPE);
         for (final ScanResult result : results) {
             final BlockScanResult br = (BlockScanResult) result;
             final int c = br.color;
             final float r = ((c >> 16) & 0xFF) / 255.0f, g = ((c >> 8) & 0xFF) / 255.0f, b = (c & 0xFF) / 255.0f;
             if (br.blocks.size() <= MAX_CONTOUR_CELLS) {
-                addClusterFill(fill, pose, br.blocks, r, g, b, 0.28f);
+                addClusterFill(fill, pose, br.blocks, r, g, b, 1.0f);
             } else {
-                addBox(fill, pose, br.bounds, r, g, b, 0.28f);
+                addBox(fill, pose, br.bounds, r, g, b, 1.0f);
             }
         }
 
@@ -288,31 +290,13 @@ public final class ScanResultProviderBlock extends AbstractScanResultProvider {
     private static void addBox(final VertexConsumer buffer, final PoseStack.Pose pose, final AABB box, final float r, final float g, final float b, final float a) {
         final float x0 = (float) box.minX, y0 = (float) box.minY, z0 = (float) box.minZ;
         final float x1 = (float) box.maxX, y1 = (float) box.maxY, z1 = (float) box.maxZ;
-        // Six quad faces (cull is off, so winding is irrelevant). POSITION_COLOR.
-        buffer.addVertex(pose, x0, y0, z0).setColor(r, g, b, a);
-        buffer.addVertex(pose, x0, y0, z1).setColor(r, g, b, a);
-        buffer.addVertex(pose, x0, y1, z1).setColor(r, g, b, a);
-        buffer.addVertex(pose, x0, y1, z0).setColor(r, g, b, a);
-        buffer.addVertex(pose, x1, y0, z1).setColor(r, g, b, a);
-        buffer.addVertex(pose, x1, y0, z0).setColor(r, g, b, a);
-        buffer.addVertex(pose, x1, y1, z0).setColor(r, g, b, a);
-        buffer.addVertex(pose, x1, y1, z1).setColor(r, g, b, a);
-        buffer.addVertex(pose, x0, y0, z0).setColor(r, g, b, a);
-        buffer.addVertex(pose, x1, y0, z0).setColor(r, g, b, a);
-        buffer.addVertex(pose, x1, y0, z1).setColor(r, g, b, a);
-        buffer.addVertex(pose, x0, y0, z1).setColor(r, g, b, a);
-        buffer.addVertex(pose, x0, y1, z1).setColor(r, g, b, a);
-        buffer.addVertex(pose, x1, y1, z1).setColor(r, g, b, a);
-        buffer.addVertex(pose, x1, y1, z0).setColor(r, g, b, a);
-        buffer.addVertex(pose, x0, y1, z0).setColor(r, g, b, a);
-        buffer.addVertex(pose, x1, y0, z0).setColor(r, g, b, a);
-        buffer.addVertex(pose, x0, y0, z0).setColor(r, g, b, a);
-        buffer.addVertex(pose, x0, y1, z0).setColor(r, g, b, a);
-        buffer.addVertex(pose, x1, y1, z0).setColor(r, g, b, a);
-        buffer.addVertex(pose, x0, y0, z1).setColor(r, g, b, a);
-        buffer.addVertex(pose, x1, y0, z1).setColor(r, g, b, a);
-        buffer.addVertex(pose, x1, y1, z1).setColor(r, g, b, a);
-        buffer.addVertex(pose, x0, y1, z1).setColor(r, g, b, a);
+        // Six quad faces (cull is off, so winding is irrelevant). POSITION_TEX_COLOR.
+        quad(buffer, pose, x0, y0, z0, x0, y0, z1, x0, y1, z1, x0, y1, z0, r, g, b, a);
+        quad(buffer, pose, x1, y0, z1, x1, y0, z0, x1, y1, z0, x1, y1, z1, r, g, b, a);
+        quad(buffer, pose, x0, y0, z0, x1, y0, z0, x1, y0, z1, x0, y0, z1, r, g, b, a);
+        quad(buffer, pose, x0, y1, z1, x1, y1, z1, x1, y1, z0, x0, y1, z0, r, g, b, a);
+        quad(buffer, pose, x1, y0, z0, x0, y0, z0, x0, y1, z0, x1, y1, z0, r, g, b, a);
+        quad(buffer, pose, x0, y0, z1, x1, y0, z1, x1, y1, z1, x0, y1, z1, r, g, b, a);
     }
 
     private static void addClusterFill(final VertexConsumer buffer, final PoseStack.Pose pose, final Set<BlockPos> cells, final float r, final float g, final float b, final float a) {
@@ -333,10 +317,11 @@ public final class ScanResultProviderBlock extends AbstractScanResultProvider {
                              final float ax, final float ay, final float az, final float bx, final float by, final float bz,
                              final float cx, final float cy, final float cz, final float dx, final float dy, final float dz,
                              final float r, final float g, final float b, final float a) {
-        buffer.addVertex(pose, ax, ay, az).setColor(r, g, b, a);
-        buffer.addVertex(pose, bx, by, bz).setColor(r, g, b, a);
-        buffer.addVertex(pose, cx, cy, cz).setColor(r, g, b, a);
-        buffer.addVertex(pose, dx, dy, dz).setColor(r, g, b, a);
+        // POSITION_TEX_COLOR with a full 0..1 UV per face so the shimmer's edge glow tracks the face border.
+        buffer.addVertex(pose, ax, ay, az).setUv(0, 1).setColor(r, g, b, a);
+        buffer.addVertex(pose, bx, by, bz).setUv(1, 1).setColor(r, g, b, a);
+        buffer.addVertex(pose, cx, cy, cz).setUv(1, 0).setColor(r, g, b, a);
+        buffer.addVertex(pose, dx, dy, dz).setUv(0, 0).setColor(r, g, b, a);
     }
 
     @Override
