@@ -13,8 +13,11 @@ import li.cil.scannable.client.ClientConfig;
 import li.cil.scannable.common.item.ScannerModuleItem;
 import li.cil.scannable.common.scanning.filter.IgnoredBlocks;
 import com.mojang.blaze3d.vertex.PoseStack;
+import com.mojang.blaze3d.vertex.VertexConsumer;
 import net.minecraft.client.Camera;
 import net.minecraft.client.renderer.MultiBufferSource;
+import net.minecraft.client.renderer.ShapeRenderer;
+import net.minecraft.client.renderer.rendertype.RenderTypes;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.SectionPos;
 import net.minecraft.core.registries.BuiltInRegistries;
@@ -35,6 +38,7 @@ import net.minecraft.world.level.chunk.PalettedContainer;
 import net.minecraft.world.level.material.FluidState;
 import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.Vec3;
+import net.minecraft.world.phys.shapes.Shapes;
 
 import javax.annotation.Nullable;
 import java.util.*;
@@ -214,9 +218,21 @@ public final class ScanResultProviderBlock extends AbstractScanResultProvider {
 
     @Override
     public void render(final ScanResultRenderContext context, final MultiBufferSource bufferSource, final PoseStack poseStack, final Camera renderInfo, final float partialTicks, final List<ScanResult> results) {
-        // TODO(Phase 3b): rebuild result-box (WORLD) + icon-label (GUI) rendering. The old path used
-        // a custom RenderType + per-cluster VertexBuffer (VBO) drawn with a ShaderInstance, all
-        // removed in 1.21.5/1.21.6. Stubbed to a no-op for the launchable build.
+        if (context != ScanResultRenderContext.WORLD) {
+            return;
+        }
+
+        // Phase 3b first pass: render each result cluster as a wireframe outline via the vanilla
+        // lines render type + ShapeRenderer helper (filled, through-wall boxes come next).
+        final VertexConsumer buffer = bufferSource.getBuffer(RenderTypes.lines());
+        for (final ScanResult result : results) {
+            final AABB bounds = result.getRenderBounds();
+            if (bounds == null) {
+                continue;
+            }
+            final int color = 0xFF000000 | ((BlockScanResult) result).color;
+            ShapeRenderer.renderShape(poseStack, buffer, Shapes.create(bounds), 0.0, 0.0, 0.0, color, 1.0f);
+        }
     }
 
     @Override

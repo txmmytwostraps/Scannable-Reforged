@@ -233,16 +233,28 @@ public final class ScanManager {
         }
     }
 
-    public static void setMatrices(final Matrix4f viewMatrix, final Matrix4f projectionMatrix) {
-        worldViewModelStack = new PoseStack();
-        worldViewModelStack.last().pose().set(viewMatrix);
-        worldProjectionMatrix = projectionMatrix;
-    }
+    public static void renderLevel(final PoseStack poseStack, final float partialTick) {
+        synchronized (renderingResults) {
+            if (renderingResults.isEmpty()) {
+                return;
+            }
 
-    public static void renderLevel(final float partialTick) {
-        // TODO(Phase 3b/3c): re-enable world result rendering once the render path is rebuilt.
-        // The 1.21.1 path drove RenderSystem matrix/state + per-provider VBO rendering, all removed
-        // in 1.21.5/1.21.6. Stubbed for the launchable build.
+            final Camera camera = Minecraft.getInstance().gameRenderer.getMainCamera();
+            final Vec3 cam = camera.position();
+
+            // The RenderLevelStageEvent pose is camera-relative; translate by the camera position so
+            // we can render results at world coordinates.
+            poseStack.pushPose();
+            poseStack.translate(-cam.x, -cam.y, -cam.z);
+
+            final MultiBufferSource.BufferSource bufferSource = MultiBufferSource.immediate(RENDER_BUFFER);
+            for (final Map.Entry<ScanResultProvider, List<ScanResult>> entry : renderingResults.entrySet()) {
+                entry.getKey().render(ScanResultRenderContext.WORLD, bufferSource, poseStack, camera, partialTick, entry.getValue());
+            }
+            bufferSource.endBatch();
+
+            poseStack.popPose();
+        }
     }
 
     public static void renderGui(final float partialTick) {

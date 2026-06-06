@@ -7,12 +7,14 @@ import li.cil.scannable.client.gui.ConfigurableBlockScannerModuleContainerScreen
 import li.cil.scannable.client.gui.ConfigurableEntityScannerModuleContainerScreen;
 import li.cil.scannable.client.gui.ScannerContainerScreen;
 import li.cil.scannable.common.container.Containers;
+import net.minecraft.client.Minecraft;
 import net.neoforged.api.distmarker.Dist;
 import net.neoforged.bus.api.SubscribeEvent;
 import net.neoforged.fml.common.EventBusSubscriber;
 import net.neoforged.fml.event.lifecycle.FMLClientSetupEvent;
 import net.neoforged.neoforge.client.event.ClientTickEvent;
 import net.neoforged.neoforge.client.event.RegisterMenuScreensEvent;
+import net.neoforged.neoforge.client.event.RenderLevelStageEvent;
 import net.neoforged.neoforge.common.NeoForge;
 
 @EventBusSubscriber(modid = API.MOD_ID, value = Dist.CLIENT)
@@ -22,12 +24,15 @@ public final class ClientSetupNeoForge {
         ClientSetup.initialize();
 
         NeoForge.EVENT_BUS.addListener(ClientSetupNeoForge::handleClientTickEvent);
+        NeoForge.EVENT_BUS.addListener(ClientSetupNeoForge::handleRenderLevel);
+    }
 
-        // TODO(Phase 3): re-add the world render hook (RenderLevelStageEvent.AFTER_LEVEL ->
-        // ScannerRenderer.render + ScanManager world rendering) and the GUI overlay layer
-        // (RegisterGuiLayersEvent -> OverlayRenderer) once the scan-effect + result rendering are
-        // rebuilt. The 1.21.1 hooks used RenderLevelStageEvent.Stage/getModelViewMatrix/
-        // getProjectionMatrix and a GuiGraphics layer, all changed in 26.1.
+    // 26.1 RenderLevelStageEvent is split into per-stage subclasses; AfterTranslucentBlocks provides
+    // a non-null pose and renders after translucent terrain (good for the scan result boxes).
+    // TODO(Phase 3c): re-add the fullscreen scan-effect + GUI overlay (OverlayRenderer / result GUI).
+    public static void handleRenderLevel(final RenderLevelStageEvent.AfterTranslucentBlocks event) {
+        final float partialTick = Minecraft.getInstance().getDeltaTracker().getGameTimeDeltaPartialTick(false);
+        ScanManager.renderLevel(event.getPoseStack(), partialTick);
     }
 
     @SubscribeEvent
