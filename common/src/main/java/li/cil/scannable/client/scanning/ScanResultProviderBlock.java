@@ -1,6 +1,5 @@
 package li.cil.scannable.client.scanning;
 
-import com.google.common.base.Strings;
 import com.mojang.blaze3d.systems.RenderSystem;
 import com.mojang.blaze3d.vertex.*;
 import io.netty.util.collection.IntObjectHashMap;
@@ -360,34 +359,21 @@ public final class ScanResultProviderBlock extends AbstractScanResultProvider {
         final float pitch = renderInfo.getXRot();
         final boolean showDistance = renderInfo.getEntity().isShiftKeyDown();
 
-        // Order results by distance to center of screen (deviation from look
-        // vector) so that labels we're looking at are in front of others.
-        results.sort(Comparator.comparing(result -> {
-            final BlockScanResult blockResult = (BlockScanResult) result;
-            final Vec3 resultPos = blockResult.getPosition();
-            final Vec3 toResult = resultPos.subtract(viewerEyes);
-            return lookVec.dot(toResult.normalize());
-        }));
+        // Order by deviation from the look vector (ascending) so the most-centered results are last.
+        results.sort(Comparator.comparing(result ->
+            lookVec.dot(result.getPosition().subtract(viewerEyes).normalize())));
 
-        for (final ScanResult result : results) {
-            final BlockScanResult blockResult = (BlockScanResult) result;
-
-            // Don't label a cluster that's been fully mined / looted since the scan.
-            if (!blockResult.hasVisible()) {
-                continue;
-            }
-
-            final Vec3 resultPos = result.getPosition();
-            final Vec3 toResult = resultPos.subtract(viewerEyes);
-            final float lookDirDot = (float) lookVec.dot(toResult.normalize());
-
-            final Block block = blockResult.block;
-            final Component label = blockResult.label != null ? blockResult.label : block.getName();
-            if (lookDirDot > 0.98f && !Strings.isNullOrEmpty(label.getString())) {
-                final float distance = showDistance ? (float) resultPos.subtract(viewerEyes).length() : 0f;
-                renderIconLabel(bufferSource, poseStack, yaw, pitch, lookVec, viewerEyes, distance, resultPos, API.ICON_INFO, label);
-            }
-        }
+        // Cap the icons (a dense ore field shouldn't fill the screen) and show a single name: icons for
+        // the MAX_ICONS most-centered results within the ~0.98 cone, name on only the most-centered.
+        renderIconLabels(bufferSource, poseStack, yaw, pitch, lookVec, viewerEyes, showDistance, results,
+            ScanResult::getPosition,
+            result -> API.ICON_INFO,
+            result -> {
+                final BlockScanResult blockResult = (BlockScanResult) result;
+                return blockResult.label != null ? blockResult.label : blockResult.block.getName();
+            },
+            result -> ((BlockScanResult) result).hasVisible(),
+            MAX_ICONS, ICON_CONE_DOT);
     }
 
     private boolean tryAddToCluster(final Map<BlockPos, BlockScanResult> clusters, final BlockPos pos) {

@@ -12,7 +12,6 @@ import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
 import net.minecraft.client.Camera;
 import net.minecraft.client.renderer.MultiBufferSource;
-import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.util.Mth;
 import net.minecraft.world.entity.Entity;
@@ -110,23 +109,18 @@ public final class ScanResultProviderEntity extends AbstractScanResultProvider {
 
         final boolean showDistance = renderInfo.getEntity().isShiftKeyDown();
 
-        // Order results by distance to center of screen (deviation from look
-        // vector) so that labels we're looking at are in front of others.
-        results.sort(Comparator.comparing(result -> {
-            final ScanResultEntity resultEntity = (ScanResultEntity) result;
-            final Vec3 entityEyes = resultEntity.entity.getEyePosition(partialTicks);
-            final Vec3 toResult = entityEyes.subtract(viewerEyes);
-            return lookVec.dot(toResult.normalize());
-        }));
+        // Order by deviation from the look vector (ascending) so the most-centered are last.
+        results.sort(Comparator.comparing(result ->
+            lookVec.dot(((ScanResultEntity) result).entity.getEyePosition(partialTicks).subtract(viewerEyes).normalize())));
 
-        for (final ScanResult result : results) {
-            final ScanResultEntity resultEntity = (ScanResultEntity) result;
-            final Component name = resultEntity.entity.getName();
-            final ResourceLocation icon = resultEntity.getIcon();
-            final Vec3 resultPos = resultEntity.entity.getEyePosition(partialTicks);
-            final float distance = showDistance ? (float) resultPos.subtract(viewerEyes).length() : 0f;
-            renderIconLabel(bufferSource, poseStack, yaw, pitch, lookVec, viewerEyes, distance, resultPos, icon, name);
-        }
+        // Mobs keep every icon (no cap, no cone) - only the name is limited to the single most-centered
+        // result, consistent with the block scans.
+        renderIconLabels(bufferSource, poseStack, yaw, pitch, lookVec, viewerEyes, showDistance, results,
+            result -> ((ScanResultEntity) result).entity.getEyePosition(partialTicks),
+            result -> ((ScanResultEntity) result).getIcon(),
+            result -> ((ScanResultEntity) result).entity.getName(),
+            result -> true,
+            Integer.MAX_VALUE, -1f);
     }
 
     @Override

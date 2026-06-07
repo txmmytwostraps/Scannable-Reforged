@@ -23,6 +23,9 @@ import org.joml.Quaternionf;
 
 import javax.annotation.Nullable;
 import java.util.Collection;
+import java.util.List;
+import java.util.function.Function;
+import java.util.function.Predicate;
 
 import static li.cil.scannable.util.UnitConversion.toRadians;
 
@@ -35,6 +38,12 @@ public abstract class AbstractScanResultProvider implements ScanResultProvider {
     protected Player player;
     protected Vec3 center;
     protected int radius;
+
+    // Block-scan icons: show at most MAX_ICONS, and only for results within ICON_CONE_DOT of the look
+    // direction (a tight cone, so they cluster around the crosshair instead of spreading across the
+    // screen). Looking right at a sparse spot shows 1; a dense one shows up to MAX_ICONS. Both tunable.
+    protected static final int MAX_ICONS = 4;
+    protected static final float ICON_CONE_DOT = 0.999f;
 
     // --------------------------------------------------------------------- //
     // ScanResultProvider
@@ -54,6 +63,46 @@ public abstract class AbstractScanResultProvider implements ScanResultProvider {
     }
 
     // --------------------------------------------------------------------- //
+
+    /**
+     * Renders icons + at most one name for a list of results, consistently across all modules. The
+     * name is shown only on the single most-centered result (so a dense scan never produces a wall of
+     * names); icons render for up to {@code maxIcons} results whose look-direction dot exceeds
+     * {@code minIconDot}. {@code results} must be pre-sorted ascending by that dot (most-centered
+     * last). Block scans pass a finite cap + a cone; entity scans pass an effectively unlimited cap so
+     * every mob keeps its icon - only the name is capped.
+     */
+    protected static <T> void renderIconLabels(final MultiBufferSource bufferSource, final PoseStack poseStack, final float yaw, final float pitch, final Vec3 lookVec, final Vec3 viewerEyes, final boolean showDistance, final List<T> results, final Function<T, Vec3> position, final Function<T, ResourceLocation> icon, final Function<T, Component> name, final Predicate<T> visible, final int maxIcons, final float minIconDot) {
+        int shown = 0;
+        boolean nameShown = false;
+        for (int i = results.size() - 1; i >= 0 && shown < maxIcons; i--) {
+            final T result = results.get(i);
+            final Vec3 resultPos = position.apply(result);
+            final Vec3 toResult = resultPos.subtract(viewerEyes);
+            final float lookDirDot = (float) lookVec.dot(toResult.normalize());
+            if (lookDirDot <= minIconDot) {
+                break; // pre-sorted: nothing earlier is more centered
+            }
+            if (!visible.test(result)) {
+                continue;
+            }
+
+            // The first (most-centered) result gets the name; renderIconLabel still gates the text to
+            // its ~0.999 cone, so at most one name ever shows. The rest are icon-only.
+            Component label = null;
+            if (!nameShown) {
+                nameShown = true;
+                final Component candidate = name.apply(result);
+                if (candidate != null && !candidate.getString().isEmpty()) {
+                    label = candidate;
+                }
+            }
+
+            final float distance = showDistance ? (float) toResult.length() : 0f;
+            renderIconLabel(bufferSource, poseStack, yaw, pitch, lookVec, viewerEyes, distance, resultPos, icon.apply(result), label);
+            shown++;
+        }
+    }
 
     /**
      * Renders an icon with a label that is only shown when looked at. This is
