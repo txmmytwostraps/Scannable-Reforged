@@ -1,6 +1,6 @@
 # Scannable Reforged
 
-A NeoForge **1.21.1** port and fork of [Scannable](https://www.curseforge.com/minecraft/mc-mods/scannable) by Florian "Sangar" Nücke. Point a scanner at the world and have nearby ores, mobs, and other points of interest highlighted, based on the modules you install.
+A NeoForge port and fork of [Scannable](https://www.curseforge.com/minecraft/mc-mods/scannable) by Florian "Sangar" Nücke, available for **Minecraft 1.21.1 and 26.1.2**. Point a scanner at the world and have nearby ores, mobs, chests, spawners, and other points of interest highlighted, based on the modules you install.
 
 ## Credits & original project
 
@@ -9,18 +9,19 @@ This project is a fork of **Scannable** by **Florian "Sangar" Nücke** (MightyPi
 - Original CurseForge: https://www.curseforge.com/minecraft/mc-mods/scannable
 - Original GitHub: https://github.com/MightyPirates/Scannable
 
-All credit for the original mod, its design, and the bulk of this code belongs to Sangar. This fork exists to bring Scannable to Minecraft 1.21.1 (NeoForge) and add a few changes. It is distributed under the same MIT license, with the original copyright notice retained.
+All credit for the original mod, its design, and the bulk of this code belongs to Sangar. This fork exists to bring Scannable to newer Minecraft versions (NeoForge) and add a few features. It is distributed under the same MIT license, with the original copyright notice retained.
 
-## What this fork changes
+## What this fork changes & adds
 
-- **Ported to Minecraft 1.21.1 / NeoForge** (the original targets up to 1.20.4).
-- **Increased the scanner's energy storage capacity** (5,000 -> 20,000 FE), so the scanner holds more charge between recharges.
-- **Added a new scanner module: Spawners** — detects mob spawners. Defaults to the vanilla `minecraft:spawner` block, which also covers mods that enhance it in place (e.g. Apotheosis). Trial-chamber blocks (`minecraft:trial_spawner`, `minecraft:vault`) or other modded spawner blocks can be added via the config.
+- **Increased the scanner's energy storage** (5,000 -> 20,000 FE), so the scanner holds more charge between recharges.
+- **Spawner module** — detects mob spawners, and can be narrowed to specific mobs so results are labeled by what they spawn. Defaults to the vanilla `minecraft:spawner` block, which also covers mods that enhance it in place (e.g. Apotheosis). Trial-chamber blocks (`minecraft:trial_spawner`, `minecraft:vault`) or other modded spawner blocks can be added via the config.
+- **Lootr module** — highlights unopened [Lootr](https://www.curseforge.com/minecraft/mc-mods/lootr) loot containers in gold, and drops each highlight as soon as you've looted it. Soft dependency: the module and its recipe only appear when Lootr is present.
+- **Hide Broken Blocks** — blocks you mine drop out of the scan highlight live, with no rescan needed.
 
-## Minecraft version / loader
+## Minecraft versions / loader
 
-- Minecraft 1.21.1
-- NeoForge only (Fabric/Forge not currently provided)
+- **Minecraft 1.21.1** and **Minecraft 26.1.2** — these are separate builds, each released as its own CurseForge file. Pick the one matching your game version.
+- NeoForge only (Fabric/Forge not currently provided).
 
 ## License
 
