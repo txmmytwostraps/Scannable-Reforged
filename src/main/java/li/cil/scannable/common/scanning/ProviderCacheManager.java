@@ -2,11 +2,12 @@ package li.cil.scannable.common.scanning;
 
 import li.cil.scannable.api.API;
 import li.cil.scannable.common.scanning.filter.IgnoredBlocks;
+import net.neoforged.api.distmarker.Dist;
 import net.neoforged.bus.api.SubscribeEvent;
 import net.neoforged.fml.common.EventBusSubscriber;
 import net.neoforged.fml.event.config.ModConfigEvent;
 
-@EventBusSubscriber(modid = API.MOD_ID)
+@EventBusSubscriber(modid = API.MOD_ID, value = Dist.CLIENT)
 public final class ProviderCacheManager {
     public static void initialize() {
     }
